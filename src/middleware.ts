@@ -1,8 +1,6 @@
-import type { Context } from "https://edge.netlify.com";
-import { Accepts } from "https://deno.land/x/accepts@2.1.1/mod.ts";
-// NOTE: deno-std isn't published each deno release, and esm.sh doesn't support `@types/`
-import { RdfaParser } from "https://esm.sh/rdfa-streaming-parser@2.0.0?deno-std=0.161.0&target=deno&no-dts";
-import rdfSerializer from "https://esm.sh/rdf-serialize?deno-std=0.161.0&target=deno&no-dts";
+import type { Context } from "@netlify/edge-functions";
+import { RdfaParser } from "rdfa-streaming-parser";
+import rdfSerializer from "rdf-serialize";
 
 function convert(
   responseText: string,
@@ -37,7 +35,7 @@ function convert(
 
 // Get list of supported content-types from rdfSerializer, these are used when
 // parsing the Accepts header
-const serializableTypes = await rdfSerializer.getContentTypes();
+// const serializableTypes = await rdfSerializer.getContentTypes();
 
 export default async (
   request: Request,
@@ -50,23 +48,21 @@ export default async (
 
   // Parse the Accept header, providing */* to catch everything that's not
   // serializable as an RDF format:
-  const accept = new Accepts(request.headers);
-  const acceptedTypes = accept.types([...serializableTypes, "*/*"]);
+  // const accept = Accepts(request);
+  // const acceptedTypes = accept.types([...serializableTypes, "*/*"]);
 
-  if (
-    // If we don't have an accepted type,
-    !acceptedTypes ||
-    // Or the catch-all matched (e.g., images or CSS),
-    acceptedTypes === "*/*"
-  ) {
-    // then step aside and let the upstream handle it.
-    return context.next();
-  }
+  // if (
+  //   // If we don't have an accepted type,
+  //   !acceptedTypes ||
+  //   // Or the catch-all matched (e.g., images or CSS),
+  //   acceptedTypes === "*/*"
+  // ) {
+  //   // then step aside and let the upstream handle it.
+  //   return context.next();
+  // }
 
   // Select the first accepted type, as it should be something supported by rdfSerializer
-  const responseFormat = Array.isArray(acceptedTypes)
-    ? acceptedTypes[0]
-    : acceptedTypes;
+  const responseFormat = request.headers.get("Accept")!;
 
   // Fetch the response from the upstream:
   const originalResponse = await context.next();
