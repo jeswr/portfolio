@@ -1,47 +1,13 @@
-import type { Context } from "@netlify/edge-functions";
-import { RdfaParser } from "rdfa-streaming-parser";
-import rdfSerializer from "rdf-serialize";
+import { transform } from 'rdf-transform';
 
-function convert(
-  responseText: string,
-  options: {
-    baseIRI: string;
-    format: string;
-  }
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const parser = new RdfaParser({
-      baseIRI: options.baseIRI,
-      contentType: "text/html",
-    }).on("error", (err: unknown) => reject(err));
+export async function middleware (request: Request): Promise<Response> {
 
-    const textStream = rdfSerializer.serialize(parser, {
-      contentType: options.format,
-    });
+  return new Response(transform(request.body as any, {
+    from: { contentType: 'text/html' },
+    to: { contentType: 'text/turtle' },
+  }) as any, request);
 
-    // Collect the stream down to a string, technically this means we might have
-    // a hard limit on dataset size to 500mb or so, but I doubt we're likely to
-    // hit into that: 512mb is a LOT of text
-    let result = "";
-    textStream
-      .on("error", (err: unknown) => reject(err))
-      .on("data", (text: string) => (result += text))
-      .on("end", () => resolve(result));
-
-    parser.write(responseText);
-    parser.end();
-  });
-}
-
-// Get list of supported content-types from rdfSerializer, these are used when
-// parsing the Accepts header
-// const serializableTypes = await rdfSerializer.getContentTypes();
-
-export async function middleware (
-  request: Request,
-  context: Context
-): Promise<Response> {
-  return fetch(request);
+  // return fetch(request);
 
   // if (!request.headers.has("Accept") || request.method !== "GET") {
   //   // treat as html, pass back to netlify to serve your HTML
