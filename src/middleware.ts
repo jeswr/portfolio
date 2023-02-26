@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { transform } from 'rdf-transform';
 
 export async function middleware (request: Request): Promise<Response> {
@@ -5,7 +6,9 @@ export async function middleware (request: Request): Promise<Response> {
   return new Response(transform(request.body as any, {
     from: { contentType: 'text/html' },
     to: { contentType: 'text/turtle' },
-  }) as any, request);
+  }) as any, {
+    headers: new Headers({ 'Content-Type': 'text/turtle' }),
+  });
 
   // return fetch(request);
 
