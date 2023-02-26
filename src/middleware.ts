@@ -50,6 +50,8 @@ export async function middleware (
     }
   }
 
+  throw new Error(`Unexpected route`)
+
   // Parse the Accept header, providing */* to catch everything that's not
   // serializable as an RDF format:
   // const accept = Accepts(request);
@@ -66,59 +68,59 @@ export async function middleware (
   // }
 
   // Select the first accepted type, as it should be something supported by rdfSerializer
-  const responseFormat = request.headers.get("Accept")!;
+  // const responseFormat = request.headers.get("Accept")!;
 
-  // Fetch the response from the upstream:
-  const originalResponse = await context.next();
+  // // Fetch the response from the upstream:
+  // const originalResponse = await context.next();
 
-  // Tracking how long the transform takes, it can't take more than 50ms:
-  const startTime = Date.now();
+  // // Tracking how long the transform takes, it can't take more than 50ms:
+  // const startTime = Date.now();
 
-  // If upstream response wasn't ok, we can't transform it:
-  if (!originalResponse.ok) {
-    return originalResponse;
-  }
+  // // If upstream response wasn't ok, we can't transform it:
+  // if (!originalResponse.ok) {
+  //   return originalResponse;
+  // }
 
-  // Don't try handling responses that aren't HTML, as these won't parse as RDFa:
-  // `netlify dev` gives `text/html`, real netlify gives `text/html; charset=UTF-8`
-  const contentType = originalResponse.headers.get("Content-Type");
-  if (!contentType || !contentType?.startsWith("text/html")) {
-    return originalResponse;
-  }
+  // // Don't try handling responses that aren't HTML, as these won't parse as RDFa:
+  // // `netlify dev` gives `text/html`, real netlify gives `text/html; charset=UTF-8`
+  // const contentType = originalResponse.headers.get("Content-Type");
+  // if (!contentType || !contentType?.startsWith("text/html")) {
+  //   return originalResponse;
+  // }
 
-  // Transform the response to the desired format
-  const responseText = await originalResponse.text();
-  const result = await convert(responseText, {
-    // In theory, we should be able to use context.site.url, which should be the site's URL,
-    // in reality, this is undefined in development, instead of, y'know the development servers'
-    // URL. So instead we just use the root of the request URL, hacky, I know.
-    //
-    // https://docs.netlify.com/configure-builds/environment-variables/#deploy-urls-and-metadata
-    // baseIRI: context.site.url,
-    baseIRI: new URL("/", request.url).toString(),
-    format: responseFormat,
-  });
+  // // Transform the response to the desired format
+  // const responseText = await originalResponse.text();
+  // const result = await convert(responseText, {
+  //   // In theory, we should be able to use context.site.url, which should be the site's URL,
+  //   // in reality, this is undefined in development, instead of, y'know the development servers'
+  //   // URL. So instead we just use the root of the request URL, hacky, I know.
+  //   //
+  //   // https://docs.netlify.com/configure-builds/environment-variables/#deploy-urls-and-metadata
+  //   // baseIRI: context.site.url,
+  //   baseIRI: new URL("/", request.url).toString(),
+  //   format: responseFormat,
+  // });
 
-  // Remove the content-length header, as we've changed the content's length by transforming it:
-  originalResponse.headers.delete("content-length");
+  // // Remove the content-length header, as we've changed the content's length by transforming it:
+  // originalResponse.headers.delete("content-length");
 
-  // Append a server-timing to indicate how long the transform took, it can't
-  // take more than 50ms (per https://docs.netlify.com/edge-functions/limits/):
-  originalResponse.headers.append(
-    "Server-Timing",
-    `rdfa-transform;dur=${Date.now() - startTime}`
-  );
+  // // Append a server-timing to indicate how long the transform took, it can't
+  // // take more than 50ms (per https://docs.netlify.com/edge-functions/limits/):
+  // originalResponse.headers.append(
+  //   "Server-Timing",
+  //   `rdfa-transform;dur=${Date.now() - startTime}`
+  // );
 
-  // For some reason we couldn't extract any RDFa, so just return the original response:
-  if (result.length === 0) {
-    context.log(`Warning: unable to transform ${request.url}`);
-    return new Response(responseText, originalResponse);
-  }
+  // // For some reason we couldn't extract any RDFa, so just return the original response:
+  // if (result.length === 0) {
+  //   context.log(`Warning: unable to transform ${request.url}`);
+  //   return new Response(responseText, originalResponse);
+  // }
 
-  // Override the content-type to text/turtle
-  originalResponse.headers.set("Content-Type", responseFormat);
-  originalResponse.headers.append("Vary", "Accept");
+  // // Override the content-type to text/turtle
+  // originalResponse.headers.set("Content-Type", responseFormat);
+  // originalResponse.headers.append("Vary", "Accept");
 
-  // Return the new response:
-  return new Response(result, originalResponse);
+  // // Return the new response:
+  // return new Response(result, originalResponse);
 };
