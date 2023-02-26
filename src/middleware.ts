@@ -44,7 +44,7 @@ export async function middleware (
   if (!request.headers.has("Accept") || request.method !== "GET") {
     // treat as html, pass back to netlify to serve your HTML
     try {
-      return await context.next();
+      return fetch(request);
     } catch (e) {
       throw new Error(`ERROR: ${e}\n\nContext is ${JSON.stringify(context, null, 2)}`)
     }
