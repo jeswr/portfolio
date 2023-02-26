@@ -41,16 +41,18 @@ export async function middleware (
   request: Request,
   context: Context
 ): Promise<Response> {
-  if (!request.headers.has("Accept") || request.method !== "GET") {
-    // treat as html, pass back to netlify to serve your HTML
-    try {
-      return fetch(request);
-    } catch (e) {
-      throw new Error(`ERROR: ${e}\n\nContext is ${JSON.stringify(context, null, 2)}`)
-    }
-  }
+  return fetch(request);
 
-  throw new Error(`Unexpected route`)
+  // if (!request.headers.has("Accept") || request.method !== "GET") {
+  //   // treat as html, pass back to netlify to serve your HTML
+  //   try {
+  //     return fetch(request);
+  //   } catch (e) {
+  //     throw new Error(`ERROR: ${e}\n\nContext is ${JSON.stringify(context, null, 2)}`)
+  //   }
+  // }
+
+  // throw new Error(`Unexpected route`)
 
   // Parse the Accept header, providing */* to catch everything that's not
   // serializable as an RDF format:
