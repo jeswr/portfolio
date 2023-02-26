@@ -37,10 +37,10 @@ function convert(
 // parsing the Accepts header
 // const serializableTypes = await rdfSerializer.getContentTypes();
 
-export default async (
+export async function middleware (
   request: Request,
   context: Context
-): Promise<Response> => {
+): Promise<Response> {
   if (!request.headers.has("Accept") || request.method !== "GET") {
     // treat as html, pass back to netlify to serve your HTML
     return context.next();
