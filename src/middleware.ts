@@ -43,7 +43,11 @@ export async function middleware (
 ): Promise<Response> {
   if (!request.headers.has("Accept") || request.method !== "GET") {
     // treat as html, pass back to netlify to serve your HTML
-    return context.next();
+    try {
+      return await context.next();
+    } catch (e) {
+      throw new Error(`ERROR: ${e}\n\nContext is ${context}`)
+    }
   }
 
   // Parse the Accept header, providing */* to catch everything that's not
