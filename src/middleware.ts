@@ -46,7 +46,7 @@ export async function middleware (
     try {
       return await context.next();
     } catch (e) {
-      throw new Error(`ERROR: ${e}\n\nContext is ${context}`)
+      throw new Error(`ERROR: ${e}\n\nContext is ${JSON.stringify(context, null, 2)}`)
     }
   }
 
