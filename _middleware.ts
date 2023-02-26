@@ -42,7 +42,7 @@ export async function middleware (
   request: Request,
   context: Context
 ): Promise<Response> {
-  return new NextResponse(null)
+  return new NextResponse(null, n)
 
   if (!request.headers.has("Accept") || request.method !== "GET") {
     // treat as html, pass back to netlify to serve your HTML
@@ -127,5 +127,5 @@ export async function middleware (
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: '/(.*)',
-  // runtime: 'edge',
+  runtime: 'edge',
 }
