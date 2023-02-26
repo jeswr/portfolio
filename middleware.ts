@@ -127,5 +127,5 @@ export async function middleware (
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: '/(.*)',
-  runtime: 'edge',
+  // runtime: 'edge',
 }
