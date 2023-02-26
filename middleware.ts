@@ -42,6 +42,8 @@ export async function middleware (
   request: Request,
   context: Context
 ): Promise<Response> {
+  return new NextResponse(null)
+
   if (!request.headers.has("Accept") || request.method !== "GET") {
     // treat as html, pass back to netlify to serve your HTML
     return context.next();
