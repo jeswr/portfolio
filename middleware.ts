@@ -1,18 +1,24 @@
+// @ts-nocheck
+import type { Context } from "https://edge.netlify.com";
 import { Accepts } from "https://deno.land/x/accepts@2.1.1/mod.ts";
 // NOTE: deno-std isn't published each deno release, and esm.sh doesn't support `@types/`
 import { RdfaParser } from "https://esm.sh/rdfa-streaming-parser@2.0.0?deno-std=0.161.0&target=deno&no-dts";
 import rdfSerializer from "https://esm.sh/rdf-serialize?deno-std=0.161.0&target=deno&no-dts";
+import { NextResponse } from "next/server";
 // https://esm.sh/rdf-transform@1.2.0?deno-std=0.161.0&target=deno&no-dts
 
 function convert(
-  responseText,
-  options
-) {
+  responseText: string,
+  options: {
+    baseIRI: string;
+    format: string;
+  }
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const parser = new RdfaParser({
       baseIRI: options.baseIRI,
       contentType: "text/html",
-    }).on("error", (err) => reject(err));
+    }).on("error", (err: unknown) => reject(err));
 
     const textStream = rdfSerializer.serialize(parser, {
       contentType: options.format,
@@ -23,8 +29,8 @@ function convert(
     // hit into that: 512mb is a LOT of text
     let result = "";
     textStream
-      .on("error", (err) => reject(err))
-      .on("data", (text) => (result += text))
+      .on("error", (err: unknown) => reject(err))
+      .on("data", (text: string) => (result += text))
       .on("end", () => resolve(result));
 
     parser.write(responseText);
@@ -33,9 +39,9 @@ function convert(
 }
 
 export async function middleware (
-  request,
-  context
-) {
+  request: Request,
+  context: Context
+): Promise<Response> {
   if (!request.headers.has("Accept") || request.method !== "GET") {
     // treat as html, pass back to netlify to serve your HTML
     return context.next();
@@ -119,4 +125,5 @@ export async function middleware (
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: '/(.*)',
+  runtime: 'edge',
 }
