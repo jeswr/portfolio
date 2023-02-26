@@ -80,6 +80,12 @@
   padding: 4rem 0;
 }
 
+.centerText {
+  font-weight: 780;
+  font-size: xxx-large;
+  font-family: 'Cyberpunk Is Not Dead', sans-serif;
+}
+
 .center::before {
   background: var(--secondary-glow);
   border-radius: 50%;
