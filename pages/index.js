@@ -20,22 +20,14 @@ export default function Home() {
             Get started by editing&nbsp;
             <code className={styles.code}>pages/index.js</code>
           </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
+          <div className={styles.profilePhoto}>
               <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
+                src="https://avatars.githubusercontent.com/u/63333554"
+                alt="Profile Photo"
+                width={75}
+                height={75}
                 priority
               />
-            </a>
           </div>
         </div>
 

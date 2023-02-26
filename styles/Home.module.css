@@ -105,11 +105,11 @@
 }
 
 .logo,
-.thirteen {
+.thirteen, .profilePhoto {
   position: relative;
 }
 
-.thirteen {
+.thirteen, .profilePhoto {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -123,15 +123,15 @@
   box-shadow: 0px 2px 8px -1px #0000001a;
 }
 
-.thirteen::before,
-.thirteen::after {
+.thirteen::before, .profilePhoto::before,
+.thirteen::after, .profilePhoto::after {
   content: '';
   position: absolute;
   z-index: -1;
 }
 
 /* Conic Gradient Animation */
-.thirteen::before {
+.thirteen::before, .profilePhoto::before {
   animation: 6s rotate linear infinite;
   width: 200%;
   height: 200%;
@@ -139,7 +139,7 @@
 }
 
 /* Inner Square */
-.thirteen::after {
+.thirteen::after, .profilePhoto::after {
   inset: 0;
   padding: 1px;
   border-radius: var(--border-radius);
@@ -164,7 +164,7 @@
 }
 
 @media (prefers-reduced-motion) {
-  .thirteen::before {
+  .thirteen::before, .profilePhoto::before {
     animation: none;
   }
 
@@ -263,8 +263,12 @@
   }
 
   .logo,
-  .thirteen img {
+  .thirteen, .profilePhoto img {
     filter: invert(1) drop-shadow(0 0 0.3rem #ffffff70);
+  }
+
+  .profilePhoto img {
+    filter: drop-shadow(0 0 0.3rem #ffffff70);
   }
 }
 
