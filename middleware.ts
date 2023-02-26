@@ -36,10 +36,6 @@ function convert(
   });
 }
 
-// Get list of supported content-types from rdfSerializer, these are used when
-// parsing the Accepts header
-const serializableTypes = await rdfSerializer.getContentTypes();
-
 export default async (
   request: Request,
   context: Context
@@ -52,7 +48,7 @@ export default async (
   // Parse the Accept header, providing */* to catch everything that's not
   // serializable as an RDF format:
   const accept = new Accepts(request.headers);
-  const acceptedTypes = accept.types([...serializableTypes, "*/*"]);
+  const acceptedTypes = accept.types([...await rdfSerializer.getContentTypes(), "*/*"]);
 
   if (
     // If we don't have an accepted type,
