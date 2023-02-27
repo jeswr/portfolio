@@ -1,7 +1,35 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { transform } from 'rdf-transform';
 
-export async function middleware (request: Request): Promise<Response> {
-  return fetch(request);
+export async function middleware (request: NextRequest): Promise<Response> {
+  if (!request.headers.has('Accept') || request.headers.get('Accept') === 'text/html') {
+    return fetch(request);
+  }
+
+  
+  return new NextResponse(
+    // @ts-ignore
+    transform(request.body, {
+      from: { contentType: 'text/html' },
+      to: { contentType: 'text/turtle' },
+      baseIRI: request.url,
+    }), {
+      headers: new Headers({ 'Content-Type': 'text/turtle' }),
+    }
+  )
+
+
+  
+  
+  
+  
+  // request.nextUrl
+  
+  // NextRequest(request);
+  
+  
+  
+  // return fetch(request);
   // @ts-ignore
   return new Response(transform(request.body, {
     from: { contentType: 'text/html' },
