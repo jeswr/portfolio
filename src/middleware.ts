@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { transform } from 'rdf-transform';
 import streamToString from 'stream-to-string';
+import stringToStream from 'string-to-stream';
 
 export async function middleware (request: NextRequest): Promise<NextResponse> {
 
 // @ts-ignore
-const string = await streamToString(transform((await fetch(request)).body, {
+const string = await streamToString(transform(stringToStream(await (await fetch(request)).text()), {
   from: { contentType: 'text/html' },
   to: { contentType: 'text/turtle' },
   baseIRI: NextResponse.next().url,
