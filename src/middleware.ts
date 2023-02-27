@@ -11,9 +11,14 @@ export async function middleware (request: NextRequest): Promise<Response> {
 //   baseIRI: NextResponse.next().url,
 // }));
 
-return new NextResponse(await (await fetch(request)).text(), {
+return new NextResponse(await NextResponse.next().text(), {
   headers: new Headers({ 'Content-Type': 'text/turtle' }),
 });
+
+// This works
+// return new NextResponse(await (await fetch(request)).text(), {
+//   headers: new Headers({ 'Content-Type': 'text/turtle' }),
+// });
   }
   
   
