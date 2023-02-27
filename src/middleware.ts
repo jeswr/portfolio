@@ -11,7 +11,7 @@ export async function middleware (request: NextRequest): Promise<Response> {
 //   baseIRI: NextResponse.next().url,
 // }));
 
-return new NextResponse(NextResponse.next().body, {
+return new NextResponse(NextResponse.next().body?.getReader(), {
   headers: new Headers({ 'Content-Type': 'text/turtle' }),
 });
   }
