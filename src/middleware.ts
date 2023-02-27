@@ -145,3 +145,7 @@ return new NextResponse(string, {
   // // Return the new response:
   // return new Response(result, originalResponse);
 };
+
+export const config = {
+  environment: 'edge'
+}
