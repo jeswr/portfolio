@@ -22,10 +22,12 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "stream-to-string": "^1.2.1",
+    "streamify-string": "^1.0.1",
     "string-to-stream": "^3.0.1",
     "typescript": "4.9.5"
   },
   "devDependencies": {
-    "@types/accepts": "^1.3.5"
+    "@types/accepts": "^1.3.5",
+    "@types/streamify-string": "^1.0.0"
   }
 }
