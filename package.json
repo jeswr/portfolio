@@ -17,9 +17,7 @@
     "eslint": "8.34.0",
     "eslint-config-next": "13.2.1",
     "next": "13.2.1",
-    "rdf-serialize": "^2.2.1",
     "rdf-transform": "^1.2.0",
-    "rdfa-streaming-parser": "^2.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "4.9.5"
