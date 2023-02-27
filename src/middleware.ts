@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { transform } from 'rdf-transform';
 import streamToString from 'stream-to-string';
 import stringToStream from 'streamify-string';
+// import { Readable } from 'readable-stream';
 
 export async function middleware (request: NextRequest): Promise<NextResponse> {
 
-const string = await streamToString(transform(stringToStream(await (await fetch(request)).text()), {
-  from: { contentType: 'text/html' },
-  to: { contentType: 'text/turtle' },
-  baseIRI: NextResponse.next().url,
-}));
+// const string = await streamToString(transform(new Readable('h'), {
+//   from: { contentType: 'text/html' },
+//   to: { contentType: 'text/turtle' },
+//   baseIRI: NextResponse.next().url,
+// }));
 
-return new NextResponse(string, {
+return new NextResponse((await fetch(request)).body, {
   headers: new Headers({ 'Content-Type': 'text/turtle' }),
 });
 
