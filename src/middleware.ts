@@ -7,18 +7,15 @@ export async function middleware (request: NextRequest): Promise<Response> {
   }
 
   
-  return new NextResponse(
-    // @ts-ignore
-    transform(request.body, {
-      from: { contentType: 'text/html' },
-      to: { contentType: 'text/turtle' },
-      baseIRI: request.url,
-    }), {
-      headers: new Headers({ 'Content-Type': 'text/turtle' }),
-    }
-  )
+  const response = new NextResponse('Hello World');
 
+  // transform(request.body, {
+  //   from: { contentType: 'text/html' },
+  //   to: { contentType: 'text/turtle' },
+  //   baseIRI: request.url,
+  // }).pipe(response.body)
 
+  return response;
   
   
   
