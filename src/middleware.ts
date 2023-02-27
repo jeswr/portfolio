@@ -7,7 +7,7 @@ export async function middleware (request: NextRequest): Promise<Response> {
   }
 
   
-  const response = new NextResponse('Hello World');
+  const response = new NextResponse(`Hello World ${request.url} [${request.headers.get('Accept')}]`);
 
   // transform(request.body, {
   //   from: { contentType: 'text/html' },
