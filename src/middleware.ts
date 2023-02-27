@@ -1,12 +1,13 @@
 import { transform } from 'rdf-transform';
 
 export async function middleware (request: Request): Promise<Response> {
-
-  return new Response(transform(request.body as any, {
+  return fetch(request);
+  // @ts-ignore
+  return new Response(transform(request.body, {
     from: { contentType: 'text/html' },
     to: { contentType: 'text/turtle' },
     baseIRI: request.url,
-  }) as any, {
+  }), {
     headers: new Headers({ 'Content-Type': 'text/turtle' }),
   });
 
