@@ -5,6 +5,7 @@ export async function middleware (request: Request): Promise<Response> {
   return new Response(transform(request.body as any, {
     from: { contentType: 'text/html' },
     to: { contentType: 'text/turtle' },
+    baseIRI: request.url,
   }) as any, {
     headers: new Headers({ 'Content-Type': 'text/turtle' }),
   });
