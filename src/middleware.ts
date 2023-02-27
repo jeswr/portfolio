@@ -4,7 +4,7 @@ import { transform } from 'rdf-transform';
 import streamToString from 'stream-to-string';
 
 export async function middleware (request: NextRequest): Promise<Response> {
-  if (request.headers.get('Accept') === 'text/turtle') {
+  if (true) {
 
 const middlewareRequest = new MiddlewareRequest(request as any);
 const response = await middlewareRequest.next();
