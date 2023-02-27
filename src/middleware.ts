@@ -1,24 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { transform } from 'rdf-transform';
+import streamToString from 'stream-to-string';
 
 export async function middleware (request: NextRequest): Promise<Response> {
-  if (!request.headers.has('Accept') || request.headers.get('Accept') === 'text/html') {
-    return fetch(request);
+  if (!request.headers.has('Accept') || request.headers.get('Accept') === 'text/html' || request.headers.get('Accept') === '*/*') {
+    return NextResponse.next();
   }
 
-  
-  const response = new NextResponse(`Hello World ${request.url} [${request.headers.get('Accept')}]`);
+  // @ts-ignore
+  const string = await streamToString(transform(NextResponse.next().body!, {
+    from: { contentType: 'text/html' },
+    to: { contentType: 'text/turtle' },
+    baseIRI: NextResponse.next().url,
+  }));
 
-  // transform(request.body, {
-  //   from: { contentType: 'text/html' },
-  //   to: { contentType: 'text/turtle' },
-  //   baseIRI: request.url,
-  // }).pipe(response.body)
-
-  return response;
-  
-  
-  
+  return new NextResponse(string, {
+    headers: new Headers({ 'Content-Type': 'text/turtle' }),
+  });
   
   // request.nextUrl
   
