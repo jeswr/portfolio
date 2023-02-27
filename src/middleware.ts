@@ -1,34 +1,25 @@
-// import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
-// import { MiddlewareRequest } from "@netlify/next";
-// import { transform } from 'rdf-transform';
-// import streamToString from 'stream-to-string';
+import { NextRequest, NextResponse } from 'next/server';
+import { transform } from 'rdf-transform';
+import streamToString from 'stream-to-string';
 
-// export async function middleware (request: NextRequest, event: NextFetchEvent): Promise<NextResponse> {
-//   request.
-  
-//   if (true) {
-//     event.sourcePage
+export async function middleware (request: NextRequest): Promise<NextResponse> {
 
-// const middlewareRequest = new MiddlewareRequest(request as any);
-// const response = await middlewareRequest.next();
+// @ts-ignore
+const string = await streamToString(transform((await fetch(request)).body, {
+  from: { contentType: 'text/html' },
+  to: { contentType: 'text/turtle' },
+  baseIRI: NextResponse.next().url,
+}));
 
+return new NextResponse(string, {
+  headers: new Headers({ 'Content-Type': 'text/turtle' }),
+});
 
-// // @ts-ignore
-// const string = await streamToString(transform(response.body, {
-//   from: { contentType: 'text/html' },
-//   to: { contentType: 'text/turtle' },
-//   baseIRI: NextResponse.next().url,
-// }));
-
-// return new NextResponse(string, {
+// This works
+// return new NextResponse(await (await fetch(request)).text(), {
 //   headers: new Headers({ 'Content-Type': 'text/turtle' }),
 // });
-
-// // This works
-// // return new NextResponse(await (await fetch(request)).text(), {
-// //   headers: new Headers({ 'Content-Type': 'text/turtle' }),
-// // });
-//   }
+  }
   
   
   
