@@ -5,13 +5,13 @@ import streamToString from 'stream-to-string';
 export async function middleware (request: NextRequest): Promise<Response> {
   if (request.headers.get('Accept') === 'text/turtle') {
 // @ts-ignore
-const string = await streamToString(transform((await fetch(request)).body, {
-  from: { contentType: 'text/html' },
-  to: { contentType: 'text/turtle' },
-  baseIRI: NextResponse.next().url,
-}));
+// const string = await streamToString(transform((await fetch(request)).body, {
+//   from: { contentType: 'text/html' },
+//   to: { contentType: 'text/turtle' },
+//   baseIRI: NextResponse.next().url,
+// }));
 
-return new NextResponse(string, {
+return new NextResponse(await (await fetch(request)).text(), {
   headers: new Headers({ 'Content-Type': 'text/turtle' }),
 });
   }
