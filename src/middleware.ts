@@ -3,6 +3,21 @@ import { transform } from 'rdf-transform';
 import streamToString from 'stream-to-string';
 
 export async function middleware (request: NextRequest): Promise<Response> {
+  if (request.headers.get('Accept') === 'text/turtle') {
+// @ts-ignore
+const string = await streamToString(transform(NextResponse.next().body!, {
+  from: { contentType: 'text/html' },
+  to: { contentType: 'text/turtle' },
+  baseIRI: NextResponse.next().url,
+}));
+
+return new NextResponse(string, {
+  headers: new Headers({ 'Content-Type': 'text/turtle' }),
+});
+  }
+  
+  
+  
   // if (!request.headers.has('Accept') || request.headers.get('Accept') === 'text/html' || request.headers.get('Accept') === '*/*') {
     return NextResponse.next();
   // }
