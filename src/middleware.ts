@@ -3,9 +3,9 @@ import { transform } from 'rdf-transform';
 import streamToString from 'stream-to-string';
 
 export async function middleware (request: NextRequest): Promise<Response> {
-  if (!request.headers.has('Accept') || request.headers.get('Accept') === 'text/html' || request.headers.get('Accept') === '*/*') {
+  // if (!request.headers.has('Accept') || request.headers.get('Accept') === 'text/html' || request.headers.get('Accept') === '*/*') {
     return NextResponse.next();
-  }
+  // }
 
   // @ts-ignore
   const string = await streamToString(transform(NextResponse.next().body!, {
