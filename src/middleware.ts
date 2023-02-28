@@ -15,7 +15,7 @@ export async function middleware (request: NextRequest): Promise<NextResponse> {
 // });
 let str = '';
 
-await new Promise((resolve, reject) => {
+await new Promise(async (resolve, reject) => {
   // @ts-ignore
   transform((await fetch(request)).body, {
     from: { contentType: 'text/html' },
