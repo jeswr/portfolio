@@ -13,12 +13,21 @@ export async function middleware (request: NextRequest): Promise<NextResponse> {
 //   to: { contentType: 'text/turtle' },
 //   baseIRI: NextResponse.next().url,
 // });
+let str = '';
+
+await new Promise((resolve, reject) => {
+  // @ts-ignore
+  transform((await fetch(request)).body, {
+    from: { contentType: 'text/html' },
+    to: { contentType: 'text/turtle' },
+    baseIRI: NextResponse.next().url,
+  }).on('end', resolve)
+    .on('error', reject)
+    .on('data', data => { str += data })
+});
+
 // @ts-ignore
-return new NextResponse(transform((await fetch(request)).body, {
-  from: { contentType: 'text/html' },
-  to: { contentType: 'text/turtle' },
-  baseIRI: NextResponse.next().url,
-}), {
+return new NextResponse(str, {
   headers: new Headers({ 'Content-Type': 'text/turtle' }),
 });
 
