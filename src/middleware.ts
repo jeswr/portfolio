@@ -4,15 +4,21 @@ import streamToString from 'stream-to-string';
 import stringToStream from 'streamify-string';
 // import { Readable } from 'readable-stream';
 
+
+
 export async function middleware (request: NextRequest): Promise<NextResponse> {
 
-// const string = await streamToString(transform(new Readable('h'), {
+// transform((await fetch(request)).body, {
 //   from: { contentType: 'text/html' },
 //   to: { contentType: 'text/turtle' },
 //   baseIRI: NextResponse.next().url,
-// }));
-
-return new NextResponse((await fetch(request)).body, {
+// });
+// @ts-ignore
+return new NextResponse(transform((await fetch(request)).body, {
+  from: { contentType: 'text/html' },
+  to: { contentType: 'text/turtle' },
+  baseIRI: NextResponse.next().url,
+}), {
   headers: new Headers({ 'Content-Type': 'text/turtle' }),
 });
 
