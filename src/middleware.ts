@@ -4,27 +4,20 @@ import { single } from 'asynciterator';
 import { Readable } from 'readable-stream';
 
 export async function middleware (request: NextRequest): Promise<NextResponse> {
-
-// transform((await fetch(request)).body, {
-//   from: { contentType: 'text/html' },
-//   to: { contentType: 'text/turtle' },
-//   baseIRI: NextResponse.next().url,
-// });
-// (await fetch(request)).body
-
+const next = NextResponse.next();
 let str = '';
 
 await new Promise(async (resolve, reject) => {
   const readable = new Readable();
   transform(readable, {
-    from: { contentType: 'text/turtle' },
+    from: { contentType: next.headers.get('Content-Type') ?? 'text/html' },
     to: { contentType: 'application/ld+json' },
-    baseIRI: NextResponse.next().url,
+    baseIRI: next.url,
   }).on('end', resolve)
     .on('error', reject)
     .on('data', data => { str += data });
 
-  readable.push('<a> <b> <c> .');
+  readable.push(await next.text());
   readable.push(null);
 });
 
