@@ -13,13 +13,15 @@ export async function middleware (request: NextRequest): Promise<NextResponse> {
 //   to: { contentType: 'text/turtle' },
 //   baseIRI: NextResponse.next().url,
 // });
+// (await fetch(request)).body
+
 let str = '';
 
 await new Promise(async (resolve, reject) => {
   // @ts-ignore
-  transform((await fetch(request)).body, {
-    from: { contentType: 'text/html' },
-    to: { contentType: 'text/turtle' },
+  transform(stringToStream('<http://example.org/a> <http://example.org/b> <http://example.org/c> .'), {
+    from: { contentType: 'text/turtle' },
+    to: { contentType: 'application/ld+json' },
     baseIRI: NextResponse.next().url,
   }).on('end', resolve)
     .on('error', reject)
