@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { transform } from 'rdf-transform';
 import { single } from 'asynciterator';
+import { Readable } from 'readable-stream';
 
 export async function middleware (request: NextRequest): Promise<NextResponse> {
 
@@ -14,13 +15,17 @@ export async function middleware (request: NextRequest): Promise<NextResponse> {
 let str = '';
 
 await new Promise(async (resolve, reject) => {
-  transform(single('<a> <b> <c> .') as any, {
+  const readable = new Readable();
+  transform(readable, {
     from: { contentType: 'text/turtle' },
     to: { contentType: 'application/ld+json' },
     baseIRI: NextResponse.next().url,
   }).on('end', resolve)
     .on('error', reject)
-    .on('data', data => { str += data })
+    .on('data', data => { str += data });
+
+  readable.push('<a> <b> <c> .');
+  readable.push(null);
 });
 
 // @ts-ignore

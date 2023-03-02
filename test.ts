@@ -1,14 +1,21 @@
 import { transform } from 'rdf-transform';
 import { single } from 'asynciterator';
+import { Readable } from 'readable-stream';
 
-function toReadableStream(value: string) {
-	return new ReadableStream({
-		start(controller) {
-			controller.enqueue(value);
-			controller.close();
-		},
-	});
-}
+const x = new Readable();
+
+// function toReadableStream(value: string) {
+// 	return new ReadableStream({
+// 		start(controller) {
+// 			controller.enqueue(value);
+// 			controller.close();
+// 		},
+// 	});
+// }
+
+// const stream = new TransformStream()
+
+// stream.readable.getReader().read().
 
 // new Promise(async (resolve, reject) => {
 //   let str = '';
