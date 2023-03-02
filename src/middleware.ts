@@ -37,7 +37,7 @@ await new Promise(async (resolve, reject) => {
 
 // @ts-ignore
 return new NextResponse(str, {
-  headers: new Headers({ 'Content-Type': 'text/turtle' }),
+  headers: new Headers({ 'Content-Type': 'application/ld+json' }),
 });
 
 // This works
