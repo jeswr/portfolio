@@ -1,17 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { transform } from 'rdf-transform';
-import streamToString from 'stream-to-string';
-import stringToStream from 'streamify-string';
-// import { Readable } from 'readable-stream';
-
-export default function toReadableStream(value: string) {
-	return new ReadableStream({
-		start(controller) {
-			controller.enqueue(value);
-			controller.close();
-		},
-	});
-}
+import { single } from 'asynciterator';
 
 export async function middleware (request: NextRequest): Promise<NextResponse> {
 
@@ -25,8 +14,7 @@ export async function middleware (request: NextRequest): Promise<NextResponse> {
 let str = '';
 
 await new Promise(async (resolve, reject) => {
-  // @ts-ignore
-  transform(toReadableStream('<http://example.org/a> <http://example.org/b> <http://example.org/c> .'), {
+  transform(single('<a> <b> <c> .') as any, {
     from: { contentType: 'text/turtle' },
     to: { contentType: 'application/ld+json' },
     baseIRI: NextResponse.next().url,
