@@ -1,26 +1,22 @@
-import { transform } from "rdf-transform";
-import streamToString from "stream-to-string";
+import { transform } from 'rdf-transform';
 
-async function main() {
-  const str = await streamToString(transform((await fetch('https://www.jeswr.org/')).body?.getReader()! as any, {
-    from: { contentType: 'text/html' },
-    to: { contentType: 'text/turtle' },
-    baseIRI: 'https://www.jeswr.org/',
-  }));  
-
-  console.log(str)
+function toReadableStream(value: string) {
+	return new ReadableStream({
+		start(controller) {
+			controller.enqueue(value);
+			controller.close();
+		},
+	});
 }
 
-main()
-
-
-
-
-
-
-
-
-
-
-
-
+new Promise(async (resolve, reject) => {
+  let str = '';
+  // @ts-ignore
+  transform(toReadableStream('<http://example.org/a> <http://example.org/b> <http://example.org/c> .'), {
+    from: { contentType: 'text/turtle' },
+    to: { contentType: 'application/ld+json' },
+    baseIRI: 'http://example.org/',
+  }).on('end', () => resolve(str))
+    .on('error', reject)
+    .on('data', (data: string) => { str += data })
+}).then(console.log)

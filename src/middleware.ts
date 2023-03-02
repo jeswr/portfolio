@@ -4,7 +4,14 @@ import streamToString from 'stream-to-string';
 import stringToStream from 'streamify-string';
 // import { Readable } from 'readable-stream';
 
-
+export default function toReadableStream(value: string) {
+	return new ReadableStream({
+		start(controller) {
+			controller.enqueue(value);
+			controller.close();
+		},
+	});
+}
 
 export async function middleware (request: NextRequest): Promise<NextResponse> {
 
@@ -19,7 +26,7 @@ let str = '';
 
 await new Promise(async (resolve, reject) => {
   // @ts-ignore
-  transform(stringToStream('<http://example.org/a> <http://example.org/b> <http://example.org/c> .'), {
+  transform(toReadableStream('<http://example.org/a> <http://example.org/b> <http://example.org/c> .'), {
     from: { contentType: 'text/turtle' },
     to: { contentType: 'application/ld+json' },
     baseIRI: NextResponse.next().url,
