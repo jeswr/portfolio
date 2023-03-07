@@ -5,6 +5,7 @@ import { Readable } from 'readable-stream';
 
 export async function middleware (request: NextRequest): Promise<NextResponse> {
 const res = await fetch(request);
+const text = await res.text();
 let str = '';
 
 await new Promise(async (resolve, reject) => {
@@ -17,7 +18,7 @@ await new Promise(async (resolve, reject) => {
     .on('error', reject)
     .on('data', data => { str += data });
 
-  readable.push(await res.text());
+  readable.push(text);
   readable.push(null);
 });
 
