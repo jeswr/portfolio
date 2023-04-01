@@ -4,14 +4,31 @@ import { single } from 'asynciterator';
 import { Readable } from 'readable-stream';
 
 export async function middleware (request: NextRequest): Promise<NextResponse> {
+  const response = await fetch(request);
+  
+  // return new NextResponse(await response.text(), {
+  //   headers: new Headers({ 'Content-Type': 'text/html' }),
+  // });
+  
+  // return new NextResponse('Hello world')
+  
+  // return NextResponse.next();
+
 const res = await fetch(request);
+
+console.log(res.headers.get('content-type'), res.headers.get('content-type')?.includes('text/html'))
+
+if (!res.headers.get('content-type')?.includes('text/html')) {
+    return NextResponse.next();
+}
+
 const text = await res.text();
 let str = '';
 
 await new Promise(async (resolve, reject) => {
   const readable = new Readable();
   transform(readable, {
-    from: { contentType: res.headers.get('Content-Type') ?? 'text/html' },
+    from: { contentType: 'text/html' },
     to: { contentType: 'application/ld+json' },
     baseIRI: res.url,
   }).on('end', resolve)
@@ -22,7 +39,7 @@ await new Promise(async (resolve, reject) => {
   readable.push(null);
 });
 
-// @ts-ignore
+// // @ts-ignore
 return new NextResponse(str, {
   headers: new Headers({ 'Content-Type': 'application/ld+json' }),
 });
