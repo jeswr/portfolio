@@ -51,11 +51,16 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.next();
   }
 
+  const headers = new Headers({
+    'content-type': mediaTypes[0]
+  });
+
+  for (const [key, value] of originalResponse.headers.entries()) {
+    headers.append(key, value);
+  }
+
   return new NextResponse(str, {
     ...originalResponse,
-    headers: new Headers({
-      ...originalResponse.headers,
-      'content-type': mediaTypes[0]
-    }),
+    headers,
   });
 }

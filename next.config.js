@@ -10,6 +10,7 @@ const nextConfig = {
     ],
   },
   async headers() {
+    // TODO: GET CORS WORKING
     return [
       {
         // matching all API routes
