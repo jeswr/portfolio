@@ -130,7 +130,7 @@ export default function Home() {
         &copy; 2023-{new Date(Date.now()).getUTCFullYear()} - Jesse Wright
         
         <br />
-        This website contains RDFa annotations and uses content-negotiation to make it a valid Solid WebId Profile. Check out the contents <a href='https://rdf-play.rubensworks.net/#url=https%3A%2F%2Fwww.jeswr.org%2F'>here</a>.
+        This website contains RDFa annotations and uses content-negotiation to make it a valid Solid WebId Profile. Check out the contents <a href='https://rdf-play.rubensworks.net/#url=https%3A%2F%2Fwww.jeswr.org%2F'>here</a>; and query over my data in Solid <a href='https://comunica.github.io/comunica-feature-link-traversal-web-clients/builds/solid-default/#datasources=https%3A%2F%2Fwww.jeswr.org%2F%23me&query=CONSTRUCT%20WHERE%20%7B%0A%20%20%20%20%3Fs%20%3Fp%20%3Fo%0A%7D'>here</a>.  
         <br />
 
         <span>
