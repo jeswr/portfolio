@@ -57,7 +57,7 @@ export default function Home() {
           My preferred pronouns are <span property='solid:preferredSubjectPronoun'>he</span>/<span property='solid:preferredObjectPronoun'>him</span>/<span property='solid:preferredRelativePronoun'>his</span>. I often go by <span property='nick'>jeswr</span>.
 
 
-
+          {/* @ts-ignore */}
           I speak <span property='schema:knowsLanguage' content='en-au'>English</span>.
         </div>
 
