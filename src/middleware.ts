@@ -1,170 +1,61 @@
+import contentType from 'content-type';
+import Negotiator from 'negotiator';
 import { NextRequest, NextResponse } from 'next/server';
-import { transform } from 'rdf-transform';
-import { single } from 'asynciterator';
+import { allowedDestinations, transform, } from 'rdf-transform';
 import { Readable } from 'readable-stream';
 
-export async function middleware (request: NextRequest): Promise<NextResponse> {
-  const response = await fetch(request);
-  
-  // return new NextResponse(await response.text(), {
-  //   headers: new Headers({ 'Content-Type': 'text/html' }),
-  // });
-  
-  // return new NextResponse('Hello world')
-  
-  // return NextResponse.next();
-
-const res = await fetch(request);
-
-console.log(res.headers.get('content-type'), res.headers.get('content-type')?.includes('text/html'))
-
-if (!res.headers.get('content-type')?.includes('text/html')) {
+export async function middleware(request: NextRequest): Promise<NextResponse> {
+  // If the request does not specify an Accept header, or will accept anything
+  // then don't do any content negotiation
+  if (!request.headers.has('Accept') || request.headers.get('Accept') === '*/*') {
     return NextResponse.next();
-}
-
-const text = await res.text();
-let str = '';
-
-await new Promise(async (resolve, reject) => {
-  const readable = new Readable();
-  transform(readable, {
-    from: { contentType: 'text/html' },
-    to: { contentType: 'application/ld+json' },
-    baseIRI: res.url,
-  }).on('end', resolve)
-    .on('error', reject)
-    .on('data', data => { str += data });
-
-  readable.push(text);
-  readable.push(null);
-});
-
-// // @ts-ignore
-return new NextResponse(str, {
-  headers: new Headers({ 'Content-Type': 'application/ld+json' }),
-});
-
-// This works
-// return new NextResponse(await (await fetch(request)).text(), {
-//   headers: new Headers({ 'Content-Type': 'text/turtle' }),
-// });
   }
-  
-  
-  
-//   // if (!request.headers.has('Accept') || request.headers.get('Accept') === 'text/html' || request.headers.get('Accept') === '*/*') {
-//     return NextResponse.next();
-//   // }
 
-//   // @ts-ignore
-//   const string = await streamToString(transform(NextResponse.next().body!, {
-//     from: { contentType: 'text/html' },
-//     to: { contentType: 'text/turtle' },
-//     baseIRI: NextResponse.next().url,
-//   }));
+  const originalResponse = await fetch(request);
+  const sourceContentType = originalResponse.headers.get('content-type');
 
-//   return new NextResponse(string, {
-//     headers: new Headers({ 'Content-Type': 'text/turtle' }),
-//   });
-  
-//   // request.nextUrl
-  
-//   // NextRequest(request);
-  
-  
-  
-//   // return fetch(request);
-//   // @ts-ignore
-//   return new Response(transform(request.body, {
-//     from: { contentType: 'text/html' },
-//     to: { contentType: 'text/turtle' },
-//     baseIRI: request.url,
-//   }), {
-//     headers: new Headers({ 'Content-Type': 'text/turtle' }),
-//   });
+  // If the upstream response doesn't have a content type then
+  // we cannot do any content negotiation
+  if (!sourceContentType) {
+    return NextResponse.next();
+  }
 
-//   // return fetch(request);
+  const content = contentType.parse(sourceContentType).type;
+  const negotiator = new Negotiator({ headers: { accept: request.headers.get('Accept') || undefined } });
+  const mediaTypes = negotiator.mediaTypes(await allowedDestinations(content));
 
-//   // if (!request.headers.has("Accept") || request.method !== "GET") {
-//   //   // treat as html, pass back to netlify to serve your HTML
-//   //   try {
-//   //     return fetch(request);
-//   //   } catch (e) {
-//   //     throw new Error(`ERROR: ${e}\n\nContext is ${JSON.stringify(context, null, 2)}`)
-//   //   }
-//   // }
+  // Don't transform if we cannot find any suitable destination media types
+  // or if we already have a suitable destination media type
+  if (mediaTypes.length === 0 || mediaTypes.includes(sourceContentType)) {
+    return NextResponse.next();
+  }
 
-//   // throw new Error(`Unexpected route`)
+  let str = '';
+  try {
+    const text = await originalResponse.text();
+    await new Promise(async (resolve, reject) => {
+      const readable = new Readable();
+      transform(readable, {
+        from: { contentType: content },
+        to: { contentType: mediaTypes[0] },
+        baseIRI: originalResponse.url,
+      }).on('end', resolve)
+        .on('error', reject)
+        .on('data', data => { str += data });
 
-//   // Parse the Accept header, providing */* to catch everything that's not
-//   // serializable as an RDF format:
-//   // const accept = Accepts(request);
-//   // const acceptedTypes = accept.types([...serializableTypes, "*/*"]);
+      readable.push(text);
+      readable.push(null);
+    });
+  } catch {
+    // If any errors occur during transformation then return the original response
+    return NextResponse.next();
+  }
 
-//   // if (
-//   //   // If we don't have an accepted type,
-//   //   !acceptedTypes ||
-//   //   // Or the catch-all matched (e.g., images or CSS),
-//   //   acceptedTypes === "*/*"
-//   // ) {
-//   //   // then step aside and let the upstream handle it.
-//   //   return context.next();
-//   // }
-
-//   // Select the first accepted type, as it should be something supported by rdfSerializer
-//   // const responseFormat = request.headers.get("Accept")!;
-
-//   // // Fetch the response from the upstream:
-//   // const originalResponse = await context.next();
-
-//   // // Tracking how long the transform takes, it can't take more than 50ms:
-//   // const startTime = Date.now();
-
-//   // // If upstream response wasn't ok, we can't transform it:
-//   // if (!originalResponse.ok) {
-//   //   return originalResponse;
-//   // }
-
-//   // // Don't try handling responses that aren't HTML, as these won't parse as RDFa:
-//   // // `netlify dev` gives `text/html`, real netlify gives `text/html; charset=UTF-8`
-//   // const contentType = originalResponse.headers.get("Content-Type");
-//   // if (!contentType || !contentType?.startsWith("text/html")) {
-//   //   return originalResponse;
-//   // }
-
-//   // // Transform the response to the desired format
-//   // const responseText = await originalResponse.text();
-//   // const result = await convert(responseText, {
-//   //   // In theory, we should be able to use context.site.url, which should be the site's URL,
-//   //   // in reality, this is undefined in development, instead of, y'know the development servers'
-//   //   // URL. So instead we just use the root of the request URL, hacky, I know.
-//   //   //
-//   //   // https://docs.netlify.com/configure-builds/environment-variables/#deploy-urls-and-metadata
-//   //   // baseIRI: context.site.url,
-//   //   baseIRI: new URL("/", request.url).toString(),
-//   //   format: responseFormat,
-//   // });
-
-//   // // Remove the content-length header, as we've changed the content's length by transforming it:
-//   // originalResponse.headers.delete("content-length");
-
-//   // // Append a server-timing to indicate how long the transform took, it can't
-//   // // take more than 50ms (per https://docs.netlify.com/edge-functions/limits/):
-//   // originalResponse.headers.append(
-//   //   "Server-Timing",
-//   //   `rdfa-transform;dur=${Date.now() - startTime}`
-//   // );
-
-//   // // For some reason we couldn't extract any RDFa, so just return the original response:
-//   // if (result.length === 0) {
-//   //   context.log(`Warning: unable to transform ${request.url}`);
-//   //   return new Response(responseText, originalResponse);
-//   // }
-
-//   // // Override the content-type to text/turtle
-//   // originalResponse.headers.set("Content-Type", responseFormat);
-//   // originalResponse.headers.append("Vary", "Accept");
-
-//   // // Return the new response:
-//   // return new Response(result, originalResponse);
-// };
+  return new NextResponse(str, {
+    ...originalResponse,
+    headers: new Headers({
+      ...originalResponse.headers,
+      'content-type': mediaTypes[0]
+    }),
+  });
+}
