@@ -135,7 +135,8 @@ export default function Home() {
 
         <span>
           <a
-            rel='account'
+            property='account'
+            rel='me'
             typeof='OnlineAccount'
             title='LinkedIn'
             href='https://www.linkedin.com/in/jesse-wright-49823a132/'
@@ -148,7 +149,8 @@ export default function Home() {
           </a>
 
           <a
-            rel='account'
+            property='account'
+            rel='me'
             typeof='OnlineAccount'
             title='GitHub'
             href='https://github.com/jeswr/'
@@ -158,7 +160,8 @@ export default function Home() {
           </a>
 
           <a
-            rel='account'
+            property='account'
+            rel='me'
             typeof='OnlineAccount'
             title='Twitter'
             href='https://twitter.com/jesmwr'
@@ -168,7 +171,8 @@ export default function Home() {
           </a>
 
           <a
-            rel='account'
+            property='account'
+            rel='me'
             typeof='OnlineAccount'
             title='Google Scholar'
             href='https://scholar.google.com.au/citations?user=J_HhOU8AAAAJ'
@@ -178,7 +182,8 @@ export default function Home() {
           </a>
 
           <a
-            rel='account'
+            property='account'
+            rel='me'
             typeof='OnlineAccount'
             title='ResearchGate'
             href='https://www.researchgate.net/profile/Jesse-Wright-5'
@@ -188,7 +193,8 @@ export default function Home() {
           </a>
 
           <a
-            rel='account'
+            property='account'
+            rel='me'
             typeof='OnlineAccount'
             title='Mastodon'
             href='https://sfba.social/@jeswr/'
@@ -201,6 +207,7 @@ export default function Home() {
           Alternate Solid Profiles:
           <a
             property='sameAs isPrimaryTopicOf rdfs:seeAlso'
+            rel='me'
             typeof='Agent'
             href='https://id.inrupt.com/jeswr'
             target='_blank'
@@ -215,6 +222,7 @@ export default function Home() {
 
           <a
             property='sameAs isPrimaryTopicOf rdfs:seeAlso'
+            rel='me'
             typeof='Agent'
             href='https://jeswr.solidcommunity.net/profile/card#me'
             target='_blank'
@@ -229,6 +237,7 @@ export default function Home() {
 
           <a
             property='sameAs isPrimaryTopicOf rdfs:seeAlso'
+            rel='me'
             typeof='Agent'
             href='https://use.id/jeswr'
             target='_blank'
