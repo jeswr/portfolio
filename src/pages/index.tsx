@@ -130,7 +130,7 @@ export default function Home() {
         &copy; 2023-{new Date(Date.now()).getUTCFullYear()} - Jesse Wright
         
         <br />
-        This website contains RDFa annotations and uses content-negotiation to make it a valid Solid WebId Profile. Check out the contents <a href='https://rdf-play.rubensworks.net/#url=https%3A%2F%2Fwww.jeswr.org%2F&proxy=https%3A%2F%2Fproxy.linkeddatafragments.org%2F'>here</a>.
+        This website contains RDFa annotations and uses content-negotiation to make it a valid Solid WebId Profile. Check out the contents <a href='https://rdf-play.rubensworks.net/#url=https%3A%2F%2Fwww.jeswr.org%2F'>here</a>.
         <br />
 
         <span>
