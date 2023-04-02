@@ -56,7 +56,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   });
 
   for (const [key, value] of originalResponse.headers.entries()) {
-    headers.append(key, value);
+    if (key !== 'content-type')
+      headers.append(key, value);
   }
 
   return new NextResponse(str, {
