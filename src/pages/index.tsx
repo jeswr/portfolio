@@ -197,7 +197,7 @@ export default function Home() {
             rel='me'
             typeof='OnlineAccount'
             title='Mastodon'
-            href='https://sfba.social/@jeswr/'
+            href='https://sfba.social/@jeswr'
             target='_blank'
           >
             <Icon path={mdiMastodon} size={1} />
