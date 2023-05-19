@@ -26,10 +26,10 @@ export default function Home() {
         <link rel="foaf:primaryTopic foaf:maker" href={`${router.pathname}#me`} />
       </Head>
       <main resource='#me' typeof="Person Agent schema:Person vcard:Individual">
-      <h1>⚠️ This site is under construction ⚠️</h1>
-        
-        
-        
+        <h1>⚠️ This site is under construction ⚠️</h1>
+
+
+
         <div className={styles.description}>
           <div className={styles.profilePhoto}>
             <a property='isPrimaryTopicOf' href={router.pathname}>
@@ -59,7 +59,35 @@ export default function Home() {
 
           {/* @ts-ignore */}
           I speak <span property='schema:knowsLanguage' content='en-au'>English</span>.
+
+          
+          {/* <span>
+          I host a Shape repository <a href="https://www.shapes.jeswr.org/" target='_blank'>here</a> - it contains SHACL 
+          </span> */}
         </div>
+
+        <br /><br /><br /><br /><br /><br />
+
+        {/* TODO: Describe this in RDFa */}
+        <div>
+          I host a Shape repository <a href="https://www.shapes.jeswr.org/" target='_blank'>here</a> - it contains
+          <a href='https://www.w3.org/TR/shacl/' target='_blank'>
+            <Image
+              src="https://cygri.github.io/rdf-logos/svg/shacl.svg"
+              alt="SHACL"
+              width={40}
+              height={40}
+              priority
+              typeof='Image dct:Image'
+              resource='https://cygri.github.io/rdf-logos/svg/shacl.svg'
+              style={{ marginLeft: '5px', marginRight: '5px' }}
+            />
+          </a>
+          shapes for Solid Applications. You can contribute to it <a href='https://github.com/jeswr/shapeRepo' target='_blank'>here</a>.
+        </div>
+
+        <br /><br /><br /><br /><br /><br />
+
 
 
         {/* https://sfba.social/@jeswr/ */}
@@ -128,9 +156,9 @@ export default function Home() {
       </main>
       <footer style={{ textAlign: 'center' }} about='#me'>
         &copy; 2023-{new Date(Date.now()).getUTCFullYear()} - Jesse Wright
-        
+
         <br />
-        This website contains RDFa annotations and uses content-negotiation to make it a valid Solid WebId Profile. Check out the contents <a href='https://rdf-play.rubensworks.net/#url=https%3A%2F%2Fwww.jeswr.org%2F'>here</a>; and query over my data in Solid <a href='https://comunica.github.io/comunica-feature-link-traversal-web-clients/builds/solid-default/#datasources=https%3A%2F%2Fwww.jeswr.org%2F%23me&query=CONSTRUCT%20WHERE%20%7B%0A%20%20%20%20%3Fs%20%3Fp%20%3Fo%0A%7D'>here</a>.  
+        This website contains RDFa annotations and uses content-negotiation to make it a valid Solid WebId Profile. Check out the contents <a href='https://rdf-play.rubensworks.net/#url=https%3A%2F%2Fwww.jeswr.org%2F'>here</a>; and query over my data in Solid <a href='https://comunica.github.io/comunica-feature-link-traversal-web-clients/builds/solid-default/#datasources=https%3A%2F%2Fwww.jeswr.org%2F%23me&query=CONSTRUCT%20WHERE%20%7B%0A%20%20%20%20%3Fs%20%3Fp%20%3Fo%0A%7D'>here</a>.
         <br />
 
         <span>
@@ -217,7 +245,7 @@ export default function Home() {
               alt='Inrupt PodSpaces'
               width={25}
               height={25}
-              />
+            />
           </a>
 
           <a
@@ -232,7 +260,7 @@ export default function Home() {
               alt='Solid Community'
               width={25}
               height={25}
-              />
+            />
           </a>
 
           <a
@@ -247,7 +275,7 @@ export default function Home() {
               alt='Use ID'
               width={25}
               height={25}
-              />
+            />
           </a>
         </span>
 
