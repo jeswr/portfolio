@@ -22,7 +22,7 @@
     "eslint-config-next": "13.4.13",
     "negotiator": "^0.6.3",
     "next": "13.4.13",
-    "next-share": "^0.24.0",
+    "next-share": "^0.25.0",
     "rdf-parse": "^2.3.2",
     "rdf-transform": "^1.2.0",
     "react": "18.2.0",
