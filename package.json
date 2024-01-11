@@ -11,7 +11,7 @@
   "dependencies": {
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
-    "@netlify/edge-functions": "^2.2.0",
+    "@netlify/edge-functions": "^2.3.0",
     "@netlify/next": "^1.4.9",
     "@types/node": "20.11.0",
     "@types/react": "18.2.47",
