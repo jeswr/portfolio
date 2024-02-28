@@ -14,7 +14,7 @@
     "@netlify/edge-functions": "^2.3.1",
     "@netlify/next": "^1.4.9",
     "@types/node": "20.11.20",
-    "@types/react": "18.2.59",
+    "@types/react": "18.2.60",
     "@types/react-dom": "18.2.19",
     "accepts": "^1.3.8",
     "content-type": "^1.0.5",
