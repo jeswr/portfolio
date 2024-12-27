@@ -27,7 +27,7 @@
     "rdf-transform": "^1.2.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "react-icons": "^4.9.0",
+    "react-icons": "^5.4.0",
     "stream-to-string": "^1.2.1",
     "streamify-string": "^1.0.1",
     "string-to-stream": "^3.0.1",
