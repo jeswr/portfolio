@@ -1,6 +1,9 @@
 export type SiteConfig = typeof siteConfig;
 
-const toPrefix = (prefixes: Record<string, string>) => Object.entries(prefixes).map(([key, value]) => `${key}: ${value}`).join(" ");
+const toPrefix = (prefixes: Record<string, string>) =>
+  Object.entries(prefixes)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join(" ");
 
 export const siteConfig = {
   name: "Jesse Wright",
@@ -18,29 +21,36 @@ export const siteConfig = {
     vcard: "http://www.w3.org/2006/vcard/ns#",
     solid: "http://www.w3.org/ns/solid/terms#",
     dct: "http://purl.org/dc/terms/",
-    jeswr: "https://www.jeswr.org/"
+    jeswr: "https://www.jeswr.org/",
+    rdfa: "http://www.w3.org/ns/rdfa#",
+    xhtml: "http://www.w3.org/1999/xhtml/vocab#",
+    patreon: "https://patreon.com/",
+    discord: "https://discord.gg/",
+    twitter: "https://twitter.com/",
+    nextGh: "https://github.com/nextui-org/",
+    gh: "https://github.com/",
   },
   navItems: [
-    {
-      label: "Home",
-      href: "/",
-    },
-    {
-      label: "Docs",
-      href: "/docs",
-    },
-    {
-      label: "Pricing",
-      href: "/pricing",
-    },
+    // {
+    //   label: "Home",
+    //   href: "/",
+    // },
+    // {
+    //   label: "Docs",
+    //   href: "/docs",
+    // },
+    // {
+    //   label: "Pricing",
+    //   href: "/pricing",
+    // },
     {
       label: "Blog",
-      href: "/blog",
+      href: "https://blog.jeswr.org",
     },
-    {
-      label: "About",
-      href: "/about",
-    },
+    // {
+    //   label: "About",
+    //   href: "/about",
+    // },
   ],
   navMenuItems: [
     {
@@ -77,10 +87,10 @@ export const siteConfig = {
     },
   ],
   links: {
-    github: "https://github.com/nextui-org/nextui",
-    twitter: "https://twitter.com/getnextui",
-    docs: "https://nextui.org",
-    discord: "https://discord.gg/9b6yyZKmH4",
-    sponsor: "https://patreon.com/jrgarciadev",
-  },
+    github: "https://github.com/jeswr",
+    twitter: "https://twitter.com/jesmwr",
+    // docs: "https://nextui.org",
+    // discord: "https://discord.gg/9b6yyZKmH4",
+    // sponsor: "https://patreon.com/jrgarciadev",
+  } as Record<string, string | undefined>,
 };

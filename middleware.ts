@@ -3,10 +3,13 @@ import Negotiator from 'negotiator';
 import { NextRequest, NextResponse } from 'next/server';
 import { allowedDestinations, transform, } from 'rdf-transform';
 import { Readable } from 'readable-stream';
+import { write } from "@jeswr/pretty-turtle";
+import { readableFromWeb } from 'readable-from-web';
+import { arrayifyStream } from 'arrayify-stream';
+import { rdfParser } from 'rdf-parse';
+import { siteConfig } from '@/config/site';
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
-  console.log('middleware');
-
   // If the request does not specify an Accept header, or will accept anything
   // then don't do any content negotiation
   if (!request.headers.has('Accept') || request.headers.get('Accept') === '*/*') {
@@ -28,33 +31,37 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   // Don't transform if we cannot find any suitable destination media types
   // or if we already have a suitable destination media type
-  if (mediaTypes.length === 0 || mediaTypes.includes(sourceContentType)) {
+  if (mediaTypes.length === 0 || mediaTypes[0] === content) {
     return NextResponse.next();
   }
 
-  let str = '';
+  let resContentType = mediaTypes[0];
+  let stream;
   try {
-    const text = await originalResponse.text();
-    await new Promise(async (resolve, reject) => {
-      const readable = new Readable();
-      transform(readable as any, {
+    const webReadable: any = readableFromWeb(originalResponse.body!);
+
+    if (mediaTypes[0] === 'text/turtle') {
+      stream = await write(
+        await arrayifyStream(rdfParser.parse(webReadable, { contentType: content, baseIRI: originalResponse.url })),
+        {
+          format: 'text/turtle',
+          prefixes: siteConfig.prefixes,
+        }
+      );
+    } else {
+      stream = transform(webReadable, {
         from: { contentType: content },
         to: { contentType: mediaTypes[0] },
         baseIRI: originalResponse.url,
-      }).on('end', resolve)
-        .on('error', reject)
-        .on('data', data => { str += data });
+      });
+    }
 
-      readable.push(text);
-      readable.push(null);
-    });
-  } catch {
-    // If any errors occur during transformation then return the original response
-    return NextResponse.next();
+  } catch (e) {
+    return new NextResponse(`${e}`, { status: 500 });
   }
 
   const headers = new Headers({
-    'content-type': mediaTypes[0]
+    'content-type': resContentType,
   });
 
   for (const [key, value] of originalResponse.headers.entries()) {
@@ -62,7 +69,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       headers.append(key, value);
   }
 
-  return new NextResponse(str, {
+  return new NextResponse(stream as any, {
     ...originalResponse,
     headers,
   });

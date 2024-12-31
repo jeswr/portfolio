@@ -6,11 +6,13 @@
 		"dev": "run-p dev:*",
 		"build": "next build",
 		"start": "next start",
-		"lint": "eslint app/ components/ config/ hooks/ types/ scripts/ -c eslint.config.mjs --fix",
+		"lint": "eslint app/ components/ config/ types/ -c eslint.config.mjs --fix",
 		"dev:next": "next dev --turbopack"
 	},
 	"dependencies": {
+		"@jeswr/pretty-turtle": "^1.5.0",
 		"@ldo/ldo": "^0.0.1-alpha.28",
+		"@nextui-org/avatar": "^2.2.5",
 		"@nextui-org/button": "2.2.8",
 		"@nextui-org/code": "2.2.5",
 		"@nextui-org/input": "2.4.7",
@@ -25,6 +27,7 @@
 		"@rdfjs/types": "^1.1.2",
 		"@react-aria/ssr": "3.9.7",
 		"@react-aria/visually-hidden": "3.8.18",
+		"arrayify-stream": "^3.0.0",
 		"clsx": "2.1.1",
 		"content-type": "^1.0.5",
 		"framer-motion": "11.15.0",
@@ -32,9 +35,11 @@
 		"negotiator": "^1.0.0",
 		"next": "15.1.2",
 		"next-themes": "^0.4.4",
+		"rdf-parse": "^4.0.0",
 		"rdf-transform": "^1.2.1",
 		"react": "19.0.0",
-		"react-dom": "19.0.0"
+		"react-dom": "19.0.0",
+		"readable-from-web": "^1.0.0"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.4",
