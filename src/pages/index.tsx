@@ -60,6 +60,8 @@ export default function Home() {
           {/* @ts-ignore */}
           I speak <span property='schema:knowsLanguage' content='en-au'>English</span>.
 
+          <span property='solid:oidcIssuerRegistrationToken' content='7eb190eb-d400-46e4-b659-99e8a093e940'></span>
+
           
           {/* <span>
           I host a Shape repository <a href="https://www.shapes.jeswr.org/" target='_blank'>here</a> - it contains SHACL 
