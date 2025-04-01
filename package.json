@@ -24,7 +24,7 @@
     "next": "15.2.4",
     "next-share": "^0.27.0",
     "rdf-parse": "^4.0.0",
-    "rdf-transform": "^1.2.1",
+    "rdf-transform": "^1.2.2",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-icons": "^4.9.0",
