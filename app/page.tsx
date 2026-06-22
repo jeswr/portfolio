@@ -13,66 +13,251 @@ import headshot from "@/public/jesse-wright.jpg";
 
 type Project = {
   name: string;
+  // "App" or "Library" — labels each card so the gallery reads honestly.
+  kind: string;
   href?: string;
   blurb: string;
 };
 
-const projects: Project[] = [
+// What Jesse is building — an apps/tools gallery. Flagship work leads; each card
+// is labelled App or Library. Links are verified to resolve publicly before use;
+// a card with no public link omits the link rather than pointing at a 404.
+const flagshipProjects: Project[] = [
   {
-    name: "Solid Project",
-    href: "https://solidproject.org/",
+    name: "SPARQ",
+    kind: "App · research",
+    href: "https://github.com/jeswr/sparq",
     blurb:
-      "Project Lead at the Open Data Institute, coordinating the technical architecture, specification development, and open-source ecosystem of Solid — the decentralized Web standard founded by Sir Tim Berners-Lee.",
+      "Privacy-preserving query verification: zero-knowledge proofs that a SPARQL query result is correct over RDF and Verifiable Credentials, without revealing the underlying data.",
   },
   {
     name: "EYE JS",
+    kind: "Library · live",
     href: "https://github.com/eyereasoner/eye-js",
     blurb:
-      "A client-side Notation3 (N3) and RDF Surfaces reasoner running in the browser via WebAssembly (ISWC 2024).",
+      "A client-side N3 and RDF Surfaces reasoning engine — the EYE reasoner compiled to WebAssembly so it runs in the browser.",
   },
   {
-    name: "N3.js Reasoner",
+    name: "N3.js",
+    kind: "Library · live",
     href: "https://github.com/rdfjs/N3.js",
     blurb:
-      "A reasoning engine built on the N3.js Linked Data toolkit for the JavaScript RDF ecosystem (ISWC 2024).",
+      "A fast, spec-compliant streaming RDF parser and serializer for JavaScript. Jesse is a core maintainer.",
   },
   {
-    name: "Schímatos",
-    href: "https://github.com/schimatos/schimatos.org",
+    name: "Pod Manager",
+    kind: "App",
+    // The repo is public, but a live app is the more useful link for an App card.
+    href: "https://app.solid-test.jeswr.org",
     blurb:
-      "A SHACL-driven web-form generator for creating and editing RDF data against shape constraints (ISWC 2020).",
+      "A modern app for managing a Solid Pod — profile, type index, sharing, and file and data views.",
   },
   {
-    name: "shapes.jeswr.org",
-    href: "https://shapes.jeswr.org/",
-    blurb: "A registry and editor for reusable SHACL shapes.",
+    name: "Solid App Store",
+    kind: "App",
+    href: "https://github.com/jeswr/solid-app-store",
+    blurb:
+      "Discover and launch every app in the Solid suite. The catalog is itself Linked Data (a DCAT dataset).",
+  },
+];
+
+const recommendedProjects: Project[] = [
+  {
+    name: "solid-issues",
+    kind: "App",
+    href: "https://github.com/jeswr/solid-issues",
+    blurb: "An issue tracker that stores your issues in your own Solid Pod.",
+  },
+  {
+    name: "create-solid-app",
+    kind: "Library · DX",
+    href: "https://github.com/jeswr/create-solid-app",
+    blurb:
+      "Run npx create-solid-app to scaffold a new Solid app with the suite conventions baked in.",
+  },
+  {
+    name: "solid-components",
+    kind: "Library",
+    href: "https://github.com/jeswr/solid-components",
+    blurb: "Declarative, codegen-friendly Solid Web Components built on Lit 3.",
+  },
+  {
+    name: "The Pod Apps",
+    kind: "App",
+    href: "https://github.com/jeswr?tab=repositories&q=pod-",
+    blurb:
+      "A family of Solid-native apps: music, drive, photos, money, health, docs, mail, and chat.",
+  },
+  {
+    name: "OSS → Solid forks",
+    kind: "App",
+    href: "https://github.com/jeswr?tab=repositories&q=excalidraw",
+    blurb:
+      "Popular open-source apps re-homed onto Solid Pods: Linkding, Elk, Excalidraw, Miniflux, and Actual.",
   },
 ];
 
 type Publication = {
   title: string;
-  venue?: string;
+  venue: string;
+  note?: string;
   href?: string;
 };
 
-const publications: Publication[] = [
+// First-author papers first, then co-authored — each group newest-first.
+const firstAuthorPublications: Publication[] = [
   {
     title:
-      "Proving Soundness of SPARQL Query Results with Zero-Knowledge Proofs",
-    venue: "ESWC 2026",
+      "Towards Provable Provenance and Privacy-Preserving Queries in Decentralised Data Architectures",
+    venue: "ISWC 2025 (Doctoral Consortium)",
+    note: "Sole author",
+    href: "https://ceur-ws.org/Vol-4085/paper19.pdf",
+  },
+  {
+    title: "N3.js Reasoner: Implementing reasoning in N3.js",
+    venue: "ISWC 2024 (Posters/Demos)",
+    note: "Sole author",
+    href: "https://ceur-ws.org/Vol-3828/paper23.pdf",
   },
   {
     title:
       "Here's Charlie! Realising the Semantic Web vision of Agents in the age of LLMs",
-    venue: "ISWC 2024",
+    venue: "ISWC 2024 (Posters/Demos)",
+    note: "Sole author",
+    href: "https://ceur-ws.org/Vol-3828/paper38.pdf",
   },
   {
-    title: "Towards Computer-Using Personal Agents",
+    title:
+      "EYE JS: A client-side reasoning engine supporting Notation3 and RDF Surfaces",
+    venue: "ISWC 2024 (Posters/Demos)",
+    note: "1st of 3 authors",
+    href: "https://ceur-ws.org/Vol-3828/paper8.pdf",
+  },
+  {
+    title:
+      "Me want cookie! Towards automated and transparent data governance on the Web",
+    venue: "NXDG@SEMANTiCS 2024",
+    note: "1st of 3 authors",
+    href: "https://ceur-ws.org/Vol-3891/paper4.pdf",
+  },
+  {
+    title:
+      "Schímatos: A SHACL-Based Web-Form Generator for Knowledge Graph Editing",
+    venue: "ISWC 2020",
+    note: "1st of 5 authors",
+    href: "https://doi.org/10.1007/978-3-030-62466-8_5",
+  },
+  {
+    title: "on2ts: TypeScript generation from OWL ontologies and SHACL",
+    venue: "ISWC 2020 (Demos)",
+    note: "1st of 5 authors",
+    href: "https://ceur-ws.org/Vol-2721/paper590.pdf",
+  },
+];
+
+const coAuthoredPublications: Publication[] = [
+  {
+    title:
+      "Proving Soundness of SPARQL Query Results Using Selective Disclosure of RDF Datasets and Zero-Knowledge Proofs",
+    venue: "ESWC 2026",
+    note: "2nd of 3 authors",
+    href: "https://doi.org/10.1007/978-3-032-25156-5_16",
   },
   {
     title: "Permission Manifests for Web Agents",
+    venue: "arXiv 2026",
+    note: "5th of 15 authors",
+    href: "https://doi.org/10.48550/arXiv.2601.02371",
+  },
+  {
+    title: "Introduce an Auditing Layer to Web Science",
+    venue: "WebSci 2025 (Companion)",
+    note: "2nd of 2 authors",
+    href: "https://doi.org/10.1145/3720554.3736184",
+  },
+  {
+    title:
+      "Let's Measure the Elephant in the Room: Facilitating Personalized Automated Analysis of Privacy Policies at Scale",
+    venue: "arXiv 2025",
+    note: "4th of 5 authors",
+    href: "https://doi.org/10.48550/arXiv.2507.14214",
+  },
+  {
+    title:
+      "An LLM-enabled semantic-centric framework to consume privacy policies",
+    venue: "arXiv 2025",
+    note: "4th of 5 authors",
+    href: "https://doi.org/10.48550/arXiv.2509.01716",
+  },
+  {
+    title: "Towards Computer-Using Personal Agents",
+    venue: "arXiv 2025",
+    note: "12th of 12 authors",
+    href: "https://doi.org/10.48550/arXiv.2503.15515",
+  },
+  {
+    title:
+      "A Scalable Communication Protocol for Networks of Large Language Models",
+    venue: "arXiv 2024",
+    note: "3rd of 7 authors",
+    href: "https://doi.org/10.48550/arXiv.2410.11905",
+  },
+  {
+    title:
+      "What's in a Pod? A Knowledge Graph Interpretation For The Solid Ecosystem",
+    venue: "QuWeDa@ISWC 2022",
+    note: "3rd of 6 authors",
+    href: "https://ceur-ws.org/Vol-3279/paper6.pdf",
+  },
+  {
+    title: "J2RM: An ontology-based JSON-to-RDF Mapping tool",
+    venue: "ISWC 2020 (Demos)",
+    note: "4th of 5 authors",
+    href: "https://ceur-ws.org/Vol-2721/paper593.pdf",
   },
 ];
+
+function ProjectCard({ project }: { project: Project }) {
+  return (
+    <li className="flex flex-col rounded-xl border border-default-200 p-5">
+      <div className="flex items-start justify-between gap-3">
+        <h4 className="text-lg font-semibold">
+          {project.href ? (
+            <Link isExternal href={project.href}>
+              {project.name}
+            </Link>
+          ) : (
+            project.name
+          )}
+        </h4>
+        <span className="shrink-0 rounded-full bg-default-100 px-2.5 py-0.5 text-xs font-medium text-default-600">
+          {project.kind}
+        </span>
+      </div>
+      <p className="mt-2 text-default-600">{project.blurb}</p>
+    </li>
+  );
+}
+
+function PublicationCard({ publication }: { publication: Publication }) {
+  return (
+    <li className="rounded-xl border border-default-200 p-5">
+      <p className="font-medium">
+        {publication.href ? (
+          <Link isExternal href={publication.href}>
+            {publication.title}
+          </Link>
+        ) : (
+          publication.title
+        )}
+      </p>
+      <p className="mt-1 text-sm text-default-500">
+        {publication.venue}
+        {publication.note ? ` · ${publication.note}` : ""}
+      </p>
+    </li>
+  );
+}
 
 export default function Home() {
   return (
@@ -150,107 +335,132 @@ export default function Home() {
       <section className="scroll-mt-20" id="about">
         <h2 className={title({ size: "sm" })}>About</h2>
         <div className="mt-4 flex flex-col gap-4 text-default-700 max-w-3xl">
+          {/* The schema:description literal stays on a clean, link-free sentence
+              so the WebID profile carries a tidy description; the linked, more
+              readable prose follows in the paragraphs below. */}
           <p
             // eslint-disable-next-line react/no-unknown-property
             property="schema:description"
           >
-            Jesse Wright is the Project Lead for the Solid Project at the Open
-            Data Institute (ODI), where he coordinates the project&apos;s
-            technical architecture, specification development, and open-source
-            ecosystem. He is a DPhil candidate at the University of Oxford
-            (Jesus College), in the Department of Computer Science
-            (Human-Centred Computing group), supervised by Nigel Shadbolt and
-            Jun Zhao, and a member of the Oxford Martin Programme on Ethical Web
-            and Data Architectures (EWADA), led by Sir Nigel Shadbolt and Sir
-            Tim Berners-Lee. His DPhil began in September 2023.
+            Jesse Wright leads the{" "}
+            <Link isExternal href="https://solidproject.org">
+              Solid
+            </Link>{" "}
+            Project at the{" "}
+            <Link isExternal href="https://theodi.org">
+              Open Data Institute
+            </Link>
+            . There he coordinates the technical architecture, the
+            specifications, and the open-source ecosystem.
           </p>
           <p>
-            His research designs architectures that let decentralized agents
-            autonomously negotiate and make decisions, and explores trusted
-            neuro-symbolic AI for the Web and query engines supporting
-            zero-knowledge proofs that data was derived from given sources —
-            driven by technologies that ensure individuals&apos; data and
-            devices serve their best interests.
+            He is also a DPhil candidate at the{" "}
+            <Link isExternal href="https://www.ox.ac.uk">
+              University of Oxford
+            </Link>
+            , at{" "}
+            <Link isExternal href="https://www.jesus.ox.ac.uk">
+              Jesus College
+            </Link>
+            . He started in September 2023, in the Department of Computer
+            Science (Human-Centred Computing group). His supervisors are{" "}
+            <Link
+              isExternal
+              href="https://www.cs.ox.ac.uk/people/nigel.shadbolt/"
+            >
+              Nigel Shadbolt
+            </Link>{" "}
+            and{" "}
+            <Link isExternal href="https://www.cs.ox.ac.uk/people/jun.zhao/">
+              Jun Zhao
+            </Link>
+            , and he is a member of the Oxford Martin{" "}
+            <Link
+              isExternal
+              href="https://www.oxfordmartin.ox.ac.uk/programmes/ethical-web-and-data-architectures"
+            >
+              EWADA
+            </Link>{" "}
+            programme. His research is on trustworthy AI for the Web,
+            decentralized data, and query engines that prove their results with
+            zero-knowledge proofs.
           </p>
           <p>
-            Previously he was a Software Engineer at Inrupt, and worked at the
-            Software Innovation Institute and the Australian National
-            University, where he earned a Bachelor of Philosophy (Science)
-            (Honours) in pure mathematics and computer science and received the
-            university medal for his thesis &ldquo;Performant Interoperable
-            Reasoning on a Decentralised Semantic Web.&rdquo;
+            Before Oxford he was a Software Engineer at{" "}
+            <Link isExternal href="https://www.inrupt.com">
+              Inrupt
+            </Link>
+            . He also worked at the Software Innovation Institute and the
+            Australian National University, where he earned a Bachelor of
+            Philosophy (Science) (Honours) in pure mathematics and computer
+            science and won the university medal for his thesis.
           </p>
         </div>
-        <p className="mt-4 text-default-600 max-w-3xl">
-          He works across Solid, Linked Data, RDF, and the broader Semantic Web
-          to build a Web where people, not platforms, own their data.
-        </p>
       </section>
 
       {/* Projects */}
       <section className="scroll-mt-20" id="projects">
         <h2 className={title({ size: "sm" })}>Projects</h2>
         <p className="mt-2 text-default-600 max-w-3xl">
-          Open-source work across the Solid suite and the Linked Data ecosystem.
+          A gallery of the apps and tools Jesse is building across the Solid
+          suite and the Linked Data ecosystem.
         </p>
-        <ul className="mt-6 grid gap-6 sm:grid-cols-2">
-          {projects.map((p) => (
-            <li
-              key={p.name}
-              className="rounded-xl border border-default-200 p-5"
-            >
-              <h3 className="text-lg font-semibold">
-                {p.href ? (
-                  <Link isExternal href={p.href}>
-                    {p.name}
-                  </Link>
-                ) : (
-                  p.name
-                )}
-              </h3>
-              <p className="mt-2 text-default-600">{p.blurb}</p>
-            </li>
+
+        <h3 className="mt-8 text-sm font-semibold uppercase tracking-wide text-default-500">
+          Flagship
+        </h3>
+        <ul className="mt-4 grid gap-6 sm:grid-cols-2">
+          {flagshipProjects.map((p) => (
+            <ProjectCard key={p.name} project={p} />
+          ))}
+        </ul>
+
+        <h3 className="mt-10 text-sm font-semibold uppercase tracking-wide text-default-500">
+          More work
+        </h3>
+        <ul className="mt-4 grid gap-6 sm:grid-cols-2">
+          {recommendedProjects.map((p) => (
+            <ProjectCard key={p.name} project={p} />
           ))}
         </ul>
       </section>
 
       {/* Research / publications */}
       <section className="scroll-mt-20" id="research">
-        <h2 className={title({ size: "sm" })}>Research &amp; publications</h2>
+        <h2 className={title({ size: "sm" })}>Selected publications</h2>
         <p className="mt-2 text-default-600 max-w-3xl">
-          Jesse&apos;s DPhil research designs a logical framework for Solid and
-          explores trustworthy, neuro-symbolic AI for the Web — including SPARQL
-          query engines that produce zero-knowledge proofs of data provenance —
-          as part of the Oxford Martin Programme on Ethical Web and Data
-          Architectures (EWADA). Full publication lists are available on{" "}
+          Jesse&apos;s research covers trustworthy, neuro-symbolic AI for the
+          Web and SPARQL query engines that produce zero-knowledge proofs of
+          data provenance. The full list is on{" "}
           <Link isExternal href={siteConfig.links.scholar}>
             Google Scholar
-          </Link>{" "}
-          and{" "}
+          </Link>
+          ,{" "}
+          <Link isExternal href={siteConfig.links.orcid}>
+            ORCID
+          </Link>
+          , and{" "}
           <Link isExternal href="https://dblp.org/pid/189/1514.html">
             DBLP
           </Link>
           .
         </p>
-        <ul className="mt-6 flex flex-col gap-4">
-          {publications.map((pub) => (
-            <li
-              key={pub.title}
-              className="rounded-xl border border-default-200 p-5"
-            >
-              <p className="font-medium">
-                {pub.href ? (
-                  <Link isExternal href={pub.href}>
-                    {pub.title}
-                  </Link>
-                ) : (
-                  pub.title
-                )}
-              </p>
-              {pub.venue ? (
-                <p className="mt-1 text-sm text-default-500">{pub.venue}</p>
-              ) : null}
-            </li>
+
+        <h3 className="mt-8 text-sm font-semibold uppercase tracking-wide text-default-500">
+          First author
+        </h3>
+        <ul className="mt-4 flex flex-col gap-4">
+          {firstAuthorPublications.map((pub) => (
+            <PublicationCard key={pub.title} publication={pub} />
+          ))}
+        </ul>
+
+        <h3 className="mt-8 text-sm font-semibold uppercase tracking-wide text-default-500">
+          Co-authored
+        </h3>
+        <ul className="mt-4 flex flex-col gap-4">
+          {coAuthoredPublications.map((pub) => (
+            <PublicationCard key={pub.title} publication={pub} />
           ))}
         </ul>
       </section>
