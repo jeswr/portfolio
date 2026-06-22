@@ -31,16 +31,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Build
-        run: npm run build
+      # Check-only lint: `npm run lint` runs eslint with --fix, which mutates
+      # files and exits 0 on auto-fixable issues, so it can NEVER fail CI. Use
+      # the check-only `lint:ci` (eslint without --fix) so a lint regression
+      # actually fails the gate.
+      - name: Lint (check-only)
+        run: npm run lint:ci
 
       - name: Install Playwright browser (chromium)
         run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright suite
+      # No standalone `npm run build` step: the Playwright webServer command is
+      # `npm run build && npm run start`, so the production build is already
+      # exercised by the e2e run (and a build failure fails the suite). Dropping
+      # the duplicate build saves CI minutes.
+      - name: Run Playwright suite (builds + serves the production bundle)
         run: npm run e2e
 
       - name: Upload Playwright report

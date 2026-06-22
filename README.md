@@ -48,6 +48,16 @@ public-hoist-pattern[]=*@nextui-org/*
 
 After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
 
+## Dependency audit note
+
+`npm audit` reports a few HIGH advisories that originate solely from **dev-only,
+build-time tooling** — the `@ldo/*` codegen tools (shex/shacl type generation)
+and `watch`. These packages are NOT part of the runtime bundle shipped to the
+browser or to the server (they run only during local schema codegen / file
+watching), so they do not affect the deployed site. Bumping them requires a
+major upgrade with breaking API changes and is tracked separately, out of scope
+for the routine dependency-bump gate.
+
 ## License
 
 Licensed under the [MIT license](https://github.com/nextui-org/next-app-template/blob/main/LICENSE).

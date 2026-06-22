@@ -10,6 +10,7 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint app/ components/ config/ types/ -c eslint.config.mjs --fix",
+		"lint:ci": "eslint app/ components/ config/ types/ -c eslint.config.mjs",
 		"dev:next": "next dev --turbopack",
 		"e2e": "playwright test"
 	},
