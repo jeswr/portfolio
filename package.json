@@ -16,7 +16,7 @@
 	},
 	"dependencies": {
 		"@jeswr/pretty-turtle": "^1.5.0",
-		"@ldo/ldo": "^0.0.1-alpha.28",
+		"@ldo/ldo": "^0.0.1-1.0.0-alpha.1.0",
 		"@nextui-org/avatar": "2.2.6",
 		"@nextui-org/button": "2.2.9",
 		"@nextui-org/code": "2.2.6",
