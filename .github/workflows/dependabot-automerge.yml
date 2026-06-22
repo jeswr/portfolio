@@ -1,0 +1,35 @@
+# Auto-merge dependabot PRs — but ONLY patch and minor bumps. Majors are left
+# for manual review (a major can change a public API; it must not slip in
+# unattended). `gh pr merge --auto` enables auto-merge, which waits for the
+# REQUIRED status checks (the CI workflow: lint + build + Playwright) to pass
+# before the squash merge happens — so a bad bump that breaks CI never lands.
+name: Dependabot automerge
+
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    name: Auto-merge patch & minor dependabot PRs
+    runs-on: ubuntu-latest
+    # Only ever act on dependabot's own PRs.
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    steps:
+      - name: Fetch dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge for patch & minor updates
+        # NEVER major — majors stay for manual review.
+        if: >-
+          ${{ steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+              steps.meta.outputs.update-type == 'version-update:semver-minor' }}
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

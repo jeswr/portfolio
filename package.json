@@ -10,7 +10,8 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint app/ components/ config/ types/ -c eslint.config.mjs --fix",
-		"dev:next": "next dev --turbopack"
+		"dev:next": "next dev --turbopack",
+		"e2e": "playwright test"
 	},
 	"dependencies": {
 		"@jeswr/pretty-turtle": "^1.5.0",
@@ -56,6 +57,7 @@
 		"@nextui-org/card": "2.2.9",
 		"@nextui-org/image": "2.2.5",
 		"@nextui-org/scroll-shadow": "2.3.5",
+		"@playwright/test": "^1.61.0",
 		"@react-types/shared": "3.26.0",
 		"@types/content-type": "^1.1.8",
 		"@types/n3": "^1.21.1",
