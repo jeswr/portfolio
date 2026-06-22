@@ -170,6 +170,12 @@ const coAuthoredPublications: Publication[] = [
     href: "https://doi.org/10.48550/arXiv.2601.02371",
   },
   {
+    title: "Addressing vulnerability in customer experience with AI-agents",
+    venue: "Journal of Service Management (Emerald), Vol. 37(3), pp. 418–450",
+    note: "2nd of 6 authors",
+    href: "https://doi.org/10.1108/JOSM-04-2025-0182",
+  },
+  {
     title: "Introduce an Auditing Layer to Web Science",
     venue: "WebSci 2025 (Companion)",
     note: "2nd of 2 authors",
