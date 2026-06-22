@@ -13,13 +13,21 @@
 # protection making CI a required check is maintainer-owned and is NOT something
 # this workflow may rely on. So the workflow ENFORCES the gate itself:
 #
-#   The "Wait for CI success" step below polls the GitHub Checks/Actions API for
-#   the repo's `CI` workflow run on the PR head SHA and only proceeds to merge
-#   when that run has CONCLUDED with conclusion == success. It is FAIL-CLOSED: if
-#   CI is still pending, failed, or — while GitHub Actions billing is blocked —
-#   never scheduled at all, the step times out and EXITS 0 WITHOUT MERGING (it
-#   does not error the workflow; it simply does not merge). Nothing ever
-#   auto-merges on a Vercel-only pass.
+#   The "Wait for CI success" step below polls the GitHub ACTIONS API
+#   (`gh run list --workflow "CI"`) for the repo's `CI` workflow run on the PR
+#   head SHA and only proceeds to merge when that run has CONCLUDED with
+#   conclusion == success. It is FAIL-CLOSED: if CI is still pending, failed, or
+#   — while GitHub Actions billing is blocked — never scheduled at all, the step
+#   times out and EXITS 0 WITHOUT MERGING (it does not error the workflow; it
+#   simply does not merge). Nothing ever auto-merges on a Vercel-only pass.
+#
+#   IMPORTANT — match the Actions workflow, NEVER a same-named third-party check:
+#   the gate is scoped to the GitHub Actions workflow named `CI` (ci.yml's
+#   top-level `name:`). It deliberately does NOT use the Checks API with a name
+#   regex, because a Vercel deployment check named with "Build" (e.g.
+#   "Vercel – Build") would match a loose regex and reintroduce the Vercel-only
+#   merge path. A Vercel deploy is not a GitHub Actions workflow, so it can never
+#   appear under `--workflow "CI"`.
 #
 # HOW THE GATE WORKS end-to-end:
 # Triggers on the PR's own `pull_request` event so `dependabot/fetch-metadata`
@@ -59,11 +67,21 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # FAIL-CLOSED CI-success guard. Polls for the repo's `CI` workflow run on
-      # the PR head SHA and only marks ci-ok when that run has CONCLUDED success.
-      # On timeout (still pending / failed / never scheduled — incl. the
-      # billing-blocked case) it sets ci-ok=false and exits 0, so the merge step
-      # below is skipped and NOTHING is merged. Only runs for patch/minor bumps.
+      # FAIL-CLOSED CI-success guard. Polls the GitHub ACTIONS API for the repo's
+      # `CI` workflow run on the PR head SHA and only marks ci-ok when that run has
+      # CONCLUDED success. On timeout (still pending / failed / never scheduled —
+      # incl. the billing-blocked case) it sets ci-ok=false and exits 0, so the
+      # merge step below is skipped and NOTHING is merged. Only runs for
+      # patch/minor bumps.
+      #
+      # WHY ACTIONS-API-ONLY (not the Checks API): the Checks API lists EVERY
+      # check-run on the commit, including third-party deployment checks. Matching
+      # those by a loose name regex (e.g. test("CI|build"; "i")) would let a
+      # Vercel deployment check named with "Build" (e.g. "Vercel – Build") satisfy
+      # the gate — reintroducing exactly the Vercel-only automerge path this guard
+      # exists to prevent. `gh run list --workflow "CI"` is scoped to the GitHub
+      # Actions workflow whose top-level `name:` is `CI` (ci.yml). A Vercel deploy
+      # is NOT a GitHub Actions workflow, so it can NEVER appear in that list.
       - name: Wait for CI (lint · build · e2e) to conclude success on the head SHA
         id: ci
         if: >-
@@ -72,8 +90,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
           REPO: ${{ github.repository }}
-          # The workflow whose success gates the merge (.github/workflows/ci.yml).
+          # The GitHub Actions workflow whose success gates the merge. Must equal
+          # ci.yml's top-level `name:` exactly (currently `CI`) so that
+          # `gh run list --workflow "$CI_WORKFLOW"` resolves to that workflow and
+          # ONLY that workflow — never a same-named third-party (e.g. Vercel) check.
           CI_WORKFLOW: CI
           # Bounded polling: 30 attempts × 30s ≈ 15 min ceiling. Fail-closed on timeout.
           MAX_ATTEMPTS: '30'
@@ -81,48 +103,43 @@ jobs:
         run: |
           set -euo pipefail
           echo "ci-ok=false" >> "$GITHUB_OUTPUT"
-          echo "Waiting for '$CI_WORKFLOW' to conclude success on head SHA $HEAD_SHA"
+          echo "Waiting for the '$CI_WORKFLOW' GitHub Actions workflow to conclude success on head SHA $HEAD_SHA"
           attempt=0
           while [ "$attempt" -lt "$MAX_ATTEMPTS" ]; do
             attempt=$((attempt + 1))
 
-            # Primary source: the Checks API for this exact commit. A check-run
-            # produced by the CI workflow whose conclusion is `success` is proof
-            # CI ran AND passed on this head SHA. Fail-closed: any API hiccup ->
-            # treat as "not yet successful" and keep polling (or time out).
-            conclusion="$(gh api \
-              "repos/${REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
-              --jq '[.check_runs[]
-                      | select((.name | test("CI|lint|build|e2e"; "i")))
-                      | .conclusion] | map(select(. == "success")) | first // ""' \
-              2>/dev/null || echo "")"
-
-            if [ "$conclusion" = "success" ]; then
-              echo "Checks API: a CI check-run concluded success on $HEAD_SHA."
-              echo "ci-ok=true" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-
-            # Corroborating source: the Actions API, matched on the CI workflow
-            # name AND the exact head SHA. Requires status=completed AND
-            # conclusion=success — a pending/failed run never satisfies this.
+            # AUTHORITATIVE + ONLY source: the GitHub Actions API, scoped to the
+            # `CI` workflow (ci.yml's top-level `name:`) via `--workflow`. We then
+            # require, for the SAME commit as the PR head:
+            #   * headSha == the PR head SHA   (this exact commit, not an older run)
+            #   * status   == "completed"      (the run has finished)
+            #   * conclusion == "success"      (it passed)
+            #   * event    == "pull_request"   (the PR-triggered run, not a push run)
+            # A Vercel deployment is NOT a GitHub Actions workflow, so it can never
+            # be returned by `--workflow "CI"` — and a third-party check merely
+            # NAMED "Build" is invisible here. A pending/failed run yields 0.
+            # Fail-closed: any API hiccup -> treat as "not yet successful", keep
+            # polling (or time out).
             run_state="$(gh run list \
               --repo "$REPO" \
               --workflow "$CI_WORKFLOW" \
-              --json headSha,status,conclusion \
+              --branch "$HEAD_REF" \
+              --json headSha,databaseId,status,conclusion,event \
               --limit 50 \
               --jq "[.[] | select(.headSha == \"${HEAD_SHA}\")
-                      | select(.status == \"completed\" and .conclusion == \"success\")]
+                      | select(.status == \"completed\")
+                      | select(.conclusion == \"success\")
+                      | select(.event == \"pull_request\")]
                      | length" \
               2>/dev/null || echo "0")"
 
             if [ "${run_state:-0}" -gt 0 ] 2>/dev/null; then
-              echo "Actions API: CI workflow concluded success on $HEAD_SHA."
+              echo "Actions API: the '$CI_WORKFLOW' workflow concluded success on $HEAD_SHA."
               echo "ci-ok=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
 
-            echo "Attempt ${attempt}/${MAX_ATTEMPTS}: CI not yet success on $HEAD_SHA; sleeping ${SLEEP_SECONDS}s."
+            echo "Attempt ${attempt}/${MAX_ATTEMPTS}: '$CI_WORKFLOW' not yet success on $HEAD_SHA; sleeping ${SLEEP_SECONDS}s."
             sleep "$SLEEP_SECONDS"
           done
 
