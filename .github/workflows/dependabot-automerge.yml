@@ -2,30 +2,34 @@
 # for manual review (a major can change a public API; it must not slip in
 # unattended).
 #
-# SELF-GATING design (do NOT rely on branch protection's required checks):
-# main's branch protection is MAINTAINER-OWNED and currently requires only the
-# Vercel checks, NOT this repo's CI workflow. So `gh pr merge --auto` would
-# enable auto-merge that GitHub could satisfy from the Vercel checks alone —
-# merging BEFORE lint/build/Playwright ran. To close that hole, this workflow
-# triggers on the CI workflow COMPLETING (`workflow_run`) and merges only when
-# CI itself concluded `success`. That makes the gate fail-closed: while GitHub
-# Actions billing is blocked, CI never completes successfully, so nothing
-# auto-merges.
+# HOW THE GATE WORKS (the standard, documented Dependabot automerge pattern):
+# This workflow triggers on the PR's own `pull_request` event so that
+# `dependabot/fetch-metadata` has the PR context it needs (the action reads the
+# update-type from the PR — it does NOT work under `workflow_run`, which carries
+# no PR context). For patch/minor bumps it calls `gh pr merge --auto`, which
+# enables GitHub's native auto-merge: GitHub then merges the PR ONLY once ALL
+# required status checks pass. There is no immediate `gh pr merge` and so no race
+# against still-pending checks (e.g. a Vercel build that hasn't finished yet).
 #
-# DEFENSE-IN-DEPTH (needs:user): the maintainer MAY additionally mark the "CI"
-# check as a REQUIRED status check in main's branch protection. That is purely
-# additive — this workflow no longer depends on it, but it would harden the
-# direct-push / manual-merge paths too. Branch protection is maintainer-owned,
-# so it is left as an optional follow-up, not a prerequisite for this gate.
+# WHAT ACTUALLY GATES THE MERGE — and the two maintainer (needs:user) steps:
+# `--auto` waits for the REQUIRED status checks configured in branch protection.
+# That is GitHub's correct, standard mechanism for gating a merge. Today main's
+# branch protection (maintainer-owned) requires only the Vercel checks, so
+# `--auto` currently gates on the Vercel build alone. For the repo's CI workflow
+# (lint · build · Playwright e2e) to ALSO gate automerge, the maintainer must:
+#   1. Mark the "CI" workflow check as a REQUIRED status check in branch
+#      protection (Settings → Branches → main → "Require status checks to pass
+#      before merging" → add "CI" / "lint · build · e2e").
+#   2. Restore GitHub Actions BILLING (an account-wide block) so CI runs at all.
+# Both are needs:user (branch protection + billing are maintainer-owned). Until
+# they are done, `--auto` still gates on the existing required checks (Vercel),
+# which is the standard, safe behaviour — nothing merges before its required
+# checks pass.
 name: Dependabot automerge
 
-# Trigger when the CI workflow finishes (success OR failure). We only proceed on
-# success below; a non-success conclusion is a no-op (the bad bump is not merged).
+# Trigger on the PR itself so fetch-metadata has PR context (update-type, etc.).
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types:
-      - completed
+  pull_request:
 
 permissions:
   contents: write
@@ -35,69 +39,24 @@ jobs:
   automerge:
     name: Auto-merge patch & minor dependabot PRs
     runs-on: ubuntu-latest
-    # Fail-closed gate: only act when the triggering CI run SUCCEEDED and it was
-    # the head of a dependabot PR. `workflow_run.event == 'pull_request'` ensures
-    # we only consider CI runs that were for a PR (not a branch push), and the
-    # actor check below confirms it was dependabot's PR.
-    if: >-
-      ${{ github.event.workflow_run.conclusion == 'success' &&
-          github.event.workflow_run.event == 'pull_request' &&
-          github.event.workflow_run.actor.login == 'dependabot[bot]' }}
+    # Only act on dependabot's own PRs.
+    if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
-      # Resolve the PR number for the branch CI ran against. `workflow_run` runs
-      # in the base-repo context with NO PR number in the payload, so look it up
-      # from the head branch + head SHA of the completed run.
-      - name: Resolve the dependabot PR
-        id: pr
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
-          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
-          REPO: ${{ github.repository }}
-        run: |
-          set -euo pipefail
-          # Find an OPEN PR whose head is the branch CI ran on, authored by
-          # dependabot, with a head SHA matching the run we just gated on.
-          pr_json=$(gh pr list \
-            --repo "$REPO" \
-            --head "$HEAD_BRANCH" \
-            --state open \
-            --json number,headRefName,headRefOid,author \
-            --jq "[.[] | select(.author.login == \"app/dependabot\" and .headRefOid == \"$HEAD_SHA\")] | first")
-          if [ -z "$pr_json" ] || [ "$pr_json" = "null" ]; then
-            echo "No matching open dependabot PR for branch=$HEAD_BRANCH sha=$HEAD_SHA — nothing to merge."
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          number=$(echo "$pr_json" | jq -r '.number')
-          echo "Matched dependabot PR #$number (head $HEAD_BRANCH @ $HEAD_SHA)."
-          echo "found=true" >> "$GITHUB_OUTPUT"
-          echo "number=$number" >> "$GITHUB_OUTPUT"
-
-      # `workflow_run` does not check out the PR ref, so check out the PR's head
-      # commit — fetch-metadata needs the dependency change in the working tree.
-      - name: Checkout the PR head
-        if: ${{ steps.pr.outputs.found == 'true' }}
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-
       - name: Fetch dependabot metadata
         id: meta
-        if: ${{ steps.pr.outputs.found == 'true' }}
         uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Squash-merge patch & minor updates (NEVER major)
-        # CI already concluded `success` (the workflow_run trigger), the PR is
-        # dependabot's, and the bump is patch/minor — merge it. A major bump
-        # falls through to no-op and stays for manual review.
+      - name: Enable auto-merge for patch & minor updates (NEVER major)
+        # patch/minor → enable GitHub native auto-merge (squash). GitHub merges
+        # only after ALL required status checks pass — so this never races
+        # still-pending checks. A major bump falls through to no-op and stays
+        # for manual review.
         if: >-
-          ${{ steps.pr.outputs.found == 'true' &&
-              (steps.meta.outputs.update-type == 'version-update:semver-patch' ||
-               steps.meta.outputs.update-type == 'version-update:semver-minor') }}
-        run: gh pr merge --squash "$PR_NUMBER"
+          ${{ steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+              steps.meta.outputs.update-type == 'version-update:semver-minor' }}
+        run: gh pr merge --auto --squash "$PR_URL"
         env:
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

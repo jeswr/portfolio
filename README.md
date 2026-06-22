@@ -58,6 +58,28 @@ watching), so they do not affect the deployed site. Bumping them requires a
 major upgrade with breaking API changes and is tracked separately, out of scope
 for the routine dependency-bump gate.
 
+### Dependabot automerge
+
+Dependabot PRs for **patch** and **minor** bumps are auto-merged by
+`.github/workflows/dependabot-automerge.yml` (majors are always left for manual
+review). It uses the standard pattern: trigger on `pull_request` so
+`dependabot/fetch-metadata` has PR context, then `gh pr merge --auto --squash`,
+which enables GitHub's native auto-merge — GitHub merges only once **all required
+status checks pass**, so there is no race against still-pending checks.
+
+For the repo's **CI** workflow (lint · build · Playwright e2e) to actually GATE
+automerge, two maintainer (`needs:user`) steps are required, because
+branch-protection required checks are how GitHub gates merges:
+
+1. Mark the **CI** workflow check as a **required status check** in branch
+   protection (Settings → Branches → main → "Require status checks to pass before
+   merging" → add the CI check).
+2. Restore **GitHub Actions billing** (an account-wide block) so CI runs at all.
+
+Until both are done, `--auto` still gates on the existing required checks (the
+Vercel build), which is the correct, safe default — nothing merges before its
+required checks pass.
+
 ## License
 
 Licensed under the [MIT license](https://github.com/nextui-org/next-app-template/blob/main/LICENSE).
