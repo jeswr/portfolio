@@ -62,23 +62,31 @@ for the routine dependency-bump gate.
 
 Dependabot PRs for **patch** and **minor** bumps are auto-merged by
 `.github/workflows/dependabot-automerge.yml` (majors are always left for manual
-review). It uses the standard pattern: trigger on `pull_request` so
-`dependabot/fetch-metadata` has PR context, then `gh pr merge --auto --squash`,
-which enables GitHub's native auto-merge — GitHub merges only once **all required
-status checks pass**, so there is no race against still-pending checks.
+review). It triggers on `pull_request` so `dependabot/fetch-metadata` has PR
+context, then — before merging — the workflow **self-enforces** that the repo's
+**CI** workflow (lint · build · Playwright e2e) has CONCLUDED **success** for the
+PR head commit, and only then squash-merges.
 
-For the repo's **CI** workflow (lint · build · Playwright e2e) to actually GATE
-automerge, two maintainer (`needs:user`) steps are required, because
-branch-protection required checks are how GitHub gates merges:
+The CI-success guard is **load-bearing and fail-closed**: it polls the GitHub
+Checks/Actions API for the `CI` workflow run on the PR head SHA (bounded, ~15 min)
+and merges only when that run concluded `success`. If CI is still pending, failed,
+or — while Actions billing is blocked — never scheduled, the guard times out and
+the workflow **exits without merging** (no error; it just doesn't merge). This is
+why nothing can auto-merge on a **Vercel-only** pass: the Vercel deployment checks
+run independently of GitHub Actions, so a bump that passes only the Vercel build
+never satisfies the CI-success guard. (`gh pr merge --auto` is still passed so any
+other required checks like Vercel are also honoured, but the explicit CI-success
+guard is what gates the merge — the workflow no longer depends on branch
+protection making CI a required check.)
 
-1. Mark the **CI** workflow check as a **required status check** in branch
-   protection (Settings → Branches → main → "Require status checks to pass before
-   merging" → add the CI check).
-2. Restore **GitHub Actions billing** (an account-wide block) so CI runs at all.
+The one `needs:user` step:
 
-Until both are done, `--auto` still gates on the existing required checks (the
-Vercel build), which is the correct, safe default — nothing merges before its
-required checks pass.
+1. Restore **GitHub Actions billing** (an account-wide block) so CI runs at all.
+   Until then the guard never sees a successful CI run, so nothing auto-merges.
+
+Marking the **CI** check a **required status check** in branch protection
+(Settings → Branches → main → "Require status checks to pass before merging") is
+now **optional defence-in-depth** — the workflow enforces the CI gate on its own.
 
 ## License
 

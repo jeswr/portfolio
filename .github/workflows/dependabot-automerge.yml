@@ -1,30 +1,41 @@
-# Auto-merge dependabot PRs — but ONLY patch and minor bumps. Majors are left
-# for manual review (a major can change a public API; it must not slip in
-# unattended).
+# Auto-merge dependabot PRs — but ONLY patch and minor bumps, and ONLY after the
+# repo's own CI gate (lint · build · Playwright e2e) has concluded SUCCESS for the
+# PR head commit. Majors are left for manual review (a major can change a public
+# API; it must not slip in unattended).
 #
-# HOW THE GATE WORKS (the standard, documented Dependabot automerge pattern):
-# This workflow triggers on the PR's own `pull_request` event so that
-# `dependabot/fetch-metadata` has the PR context it needs (the action reads the
-# update-type from the PR — it does NOT work under `workflow_run`, which carries
-# no PR context). For patch/minor bumps it calls `gh pr merge --auto`, which
-# enables GitHub's native auto-merge: GitHub then merges the PR ONLY once ALL
-# required status checks pass. There is no immediate `gh pr merge` and so no race
-# against still-pending checks (e.g. a Vercel build that hasn't finished yet).
+# WHY AN EXPLICIT CI-SUCCESS GUARD (not just `gh pr merge --auto`):
+# `--auto` merges once the BRANCH-PROTECTION required checks pass. On this repo
+# the required checks are the Vercel deployment checks, and Vercel runs
+# INDEPENDENTLY of GitHub Actions. So with `--auto` alone a patch/minor bump
+# could auto-merge the moment the Vercel BUILD goes green — WITHOUT the repo's CI
+# (lint + build + Playwright) ever running. A bump could break the WebID content
+# negotiation behaviourally yet still merge because Vercel built it. Branch
+# protection making CI a required check is maintainer-owned and is NOT something
+# this workflow may rely on. So the workflow ENFORCES the gate itself:
 #
-# WHAT ACTUALLY GATES THE MERGE — and the two maintainer (needs:user) steps:
-# `--auto` waits for the REQUIRED status checks configured in branch protection.
-# That is GitHub's correct, standard mechanism for gating a merge. Today main's
-# branch protection (maintainer-owned) requires only the Vercel checks, so
-# `--auto` currently gates on the Vercel build alone. For the repo's CI workflow
-# (lint · build · Playwright e2e) to ALSO gate automerge, the maintainer must:
-#   1. Mark the "CI" workflow check as a REQUIRED status check in branch
-#      protection (Settings → Branches → main → "Require status checks to pass
-#      before merging" → add "CI" / "lint · build · e2e").
-#   2. Restore GitHub Actions BILLING (an account-wide block) so CI runs at all.
-# Both are needs:user (branch protection + billing are maintainer-owned). Until
-# they are done, `--auto` still gates on the existing required checks (Vercel),
-# which is the standard, safe behaviour — nothing merges before its required
-# checks pass.
+#   The "Wait for CI success" step below polls the GitHub Checks/Actions API for
+#   the repo's `CI` workflow run on the PR head SHA and only proceeds to merge
+#   when that run has CONCLUDED with conclusion == success. It is FAIL-CLOSED: if
+#   CI is still pending, failed, or — while GitHub Actions billing is blocked —
+#   never scheduled at all, the step times out and EXITS 0 WITHOUT MERGING (it
+#   does not error the workflow; it simply does not merge). Nothing ever
+#   auto-merges on a Vercel-only pass.
+#
+# HOW THE GATE WORKS end-to-end:
+# Triggers on the PR's own `pull_request` event so `dependabot/fetch-metadata`
+# has the PR context it needs (the action reads the update-type from the PR — it
+# does NOT work under `workflow_run`, which carries no PR context). For
+# patch/minor bumps only, it waits for CI success on the head SHA, then squash-
+# merges. `--auto` is additionally passed so that any OTHER required checks
+# (e.g. Vercel) are also honoured — but the explicit CI-success guard above is
+# the load-bearing gate.
+#
+# THE ONE needs:user STEP — RESTORE GITHUB ACTIONS BILLING:
+# While Actions billing is account-blocked, the CI run never concludes success,
+# so the guard never passes and nothing auto-merges. Once billing is restored,
+# CI runs, the guard passes, and patch/minor automerge works as intended. Marking
+# CI a required status check in branch protection is now OPTIONAL defence-in-depth
+# (this workflow no longer depends on it).
 name: Dependabot automerge
 
 # Trigger on the PR itself so fetch-metadata has PR context (update-type, etc.).
@@ -48,14 +59,88 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Enable auto-merge for patch & minor updates (NEVER major)
-        # patch/minor → enable GitHub native auto-merge (squash). GitHub merges
-        # only after ALL required status checks pass — so this never races
-        # still-pending checks. A major bump falls through to no-op and stays
-        # for manual review.
+      # FAIL-CLOSED CI-success guard. Polls for the repo's `CI` workflow run on
+      # the PR head SHA and only marks ci-ok when that run has CONCLUDED success.
+      # On timeout (still pending / failed / never scheduled — incl. the
+      # billing-blocked case) it sets ci-ok=false and exits 0, so the merge step
+      # below is skipped and NOTHING is merged. Only runs for patch/minor bumps.
+      - name: Wait for CI (lint · build · e2e) to conclude success on the head SHA
+        id: ci
         if: >-
           ${{ steps.meta.outputs.update-type == 'version-update:semver-patch' ||
               steps.meta.outputs.update-type == 'version-update:semver-minor' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ github.repository }}
+          # The workflow whose success gates the merge (.github/workflows/ci.yml).
+          CI_WORKFLOW: CI
+          # Bounded polling: 30 attempts × 30s ≈ 15 min ceiling. Fail-closed on timeout.
+          MAX_ATTEMPTS: '30'
+          SLEEP_SECONDS: '30'
+        run: |
+          set -euo pipefail
+          echo "ci-ok=false" >> "$GITHUB_OUTPUT"
+          echo "Waiting for '$CI_WORKFLOW' to conclude success on head SHA $HEAD_SHA"
+          attempt=0
+          while [ "$attempt" -lt "$MAX_ATTEMPTS" ]; do
+            attempt=$((attempt + 1))
+
+            # Primary source: the Checks API for this exact commit. A check-run
+            # produced by the CI workflow whose conclusion is `success` is proof
+            # CI ran AND passed on this head SHA. Fail-closed: any API hiccup ->
+            # treat as "not yet successful" and keep polling (or time out).
+            conclusion="$(gh api \
+              "repos/${REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
+              --jq '[.check_runs[]
+                      | select((.name | test("CI|lint|build|e2e"; "i")))
+                      | .conclusion] | map(select(. == "success")) | first // ""' \
+              2>/dev/null || echo "")"
+
+            if [ "$conclusion" = "success" ]; then
+              echo "Checks API: a CI check-run concluded success on $HEAD_SHA."
+              echo "ci-ok=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            # Corroborating source: the Actions API, matched on the CI workflow
+            # name AND the exact head SHA. Requires status=completed AND
+            # conclusion=success — a pending/failed run never satisfies this.
+            run_state="$(gh run list \
+              --repo "$REPO" \
+              --workflow "$CI_WORKFLOW" \
+              --json headSha,status,conclusion \
+              --limit 50 \
+              --jq "[.[] | select(.headSha == \"${HEAD_SHA}\")
+                      | select(.status == \"completed\" and .conclusion == \"success\")]
+                     | length" \
+              2>/dev/null || echo "0")"
+
+            if [ "${run_state:-0}" -gt 0 ] 2>/dev/null; then
+              echo "Actions API: CI workflow concluded success on $HEAD_SHA."
+              echo "ci-ok=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            echo "Attempt ${attempt}/${MAX_ATTEMPTS}: CI not yet success on $HEAD_SHA; sleeping ${SLEEP_SECONDS}s."
+            sleep "$SLEEP_SECONDS"
+          done
+
+          # Timed out: CI never concluded success (pending / failed / never
+          # scheduled, e.g. Actions billing blocked). FAIL-CLOSED — do NOT merge,
+          # but do NOT error the workflow. ci-ok stays false, merge step is skipped.
+          echo "Timed out after ${MAX_ATTEMPTS} attempts: CI did not conclude success on $HEAD_SHA. Not merging."
+          exit 0
+
+      - name: Merge patch & minor updates (NEVER major) — only after CI success
+        # Gate: patch/minor AND the explicit CI-success guard passed. `--auto`
+        # additionally honours any OTHER required checks (e.g. Vercel), but the
+        # CI-success guard above is the load-bearing gate. A major bump, or any
+        # case where CI did not conclude success, is a no-op (left for review).
+        if: >-
+          ${{ (steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+               steps.meta.outputs.update-type == 'version-update:semver-minor') &&
+              steps.ci.outputs.ci-ok == 'true' }}
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
