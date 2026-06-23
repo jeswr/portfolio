@@ -10,11 +10,27 @@ import { rdfParser } from 'rdf-parse';
 import { DataFactory } from 'n3';
 import { siteConfig } from '@/config/site';
 
-// Only run on document routes. Everything in this matcher's negative lookahead
-// (Next internals, static assets, generated metadata routes, the OG image) must
-// NEVER be re-fetched or content-negotiated — doing so would corrupt images,
-// the sitemap/robots/manifest, and the OG card.
+// Run this middleware on the **Node.js runtime**, not the default Edge Runtime.
+//
+// This is the fix for the MIDDLEWARE_INVOCATION_FAILED outage. The RDFa → RDF
+// content negotiation below imports the Node-stream RDF stack
+// (rdf-transform → rdf-parse → @comunica → asynciterator → readable-stream →
+// tiny-set-immediate), which uses Node-only APIs (MessageChannel/setImmediate,
+// process.platform/version). On the Edge Runtime that module fails to load, and
+// because this matcher covers every document route, EVERY page 500'd with
+// MIDDLEWARE_INVOCATION_FAILED before a line of handler code ran.
+//
+// Stable Node.js middleware landed in Next 15.5.0 (this app is on 15.5.19), so
+// setting `runtime: 'nodejs'` lets the already-tested conneg logic run unchanged
+// in an environment where those libraries work — the lowest-regression fix. A
+// clean `next build` reports "Middleware ... (Node.js)" with zero edge-runtime
+// Node-API warnings; see tests/webid-conneg.spec.ts for the behavioural contract.
+//
+// The matcher's negative lookahead (Next internals, static assets, generated
+// metadata routes, the OG image) must NEVER be re-fetched or content-negotiated
+// — doing so would corrupt images, the sitemap/robots/manifest, and the OG card.
 export const config = {
+  runtime: 'nodejs',
   matcher: [
     '/((?!_next/|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|txt|xml|json|woff2?|ttf)$).*)',
   ],
