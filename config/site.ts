@@ -106,5 +106,15 @@ export const siteConfig = {
     scholar: "https://scholar.google.com.au/citations?user=J_HhOU8AAAAJ",
     orcid: "https://orcid.org/0000-0002-5771-988X",
     blog: "https://blog.jeswr.org/",
+    // Jesse's OWN personal-profile pages on the organisations he is part of —
+    // linked from the natural anchor text where each role/affiliation is named
+    // in About (his ODI team profile, his Oxford CS people page, his Oxford
+    // Martin people page). Each is also asserted as schema:sameAs/rdfs:seeAlso
+    // on <#me> via siteConfig.sameAs above, so they stay a single source of
+    // truth — the same exact URLs.
+    odiProfile: "https://theodi.org/profile/jesse-wright/",
+    oxfordProfile: "https://www.cs.ox.ac.uk/people/jesse.wright/",
+    oxfordMartinProfile:
+      "https://www.oxfordmartin.ox.ac.uk/people/jesse-wright",
   } as Record<string, string | undefined>,
 };

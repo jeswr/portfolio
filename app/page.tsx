@@ -297,11 +297,17 @@ export default function Home() {
             University of Oxford
           </p>
           <p className="mt-2 text-default-600 max-w-xl mx-auto md:mx-0">
-            Jesse Wright is the Solid Project Lead at the Open Data Institute
-            (ODI) and a DPhil candidate at the University of Oxford (Jesus
-            College; Department of Computer Science, Human-Centred Computing
-            group), where his research focuses on trustworthy AI for the Web and
-            decentralized data architectures.
+            Jesse Wright is the{" "}
+            <Link isExternal href={siteConfig.links.odiProfile}>
+              Solid Project Lead at the Open Data Institute
+            </Link>{" "}
+            (ODI) and a{" "}
+            <Link isExternal href={siteConfig.links.oxfordProfile}>
+              DPhil candidate at the University of Oxford
+            </Link>{" "}
+            (Jesus College; Department of Computer Science, Human-Centred
+            Computing group), where his research focuses on trustworthy AI for
+            the Web and decentralized data architectures.
           </p>
           <div className="mt-6 flex flex-wrap gap-4 justify-center md:justify-start">
             <Link
@@ -368,8 +374,11 @@ export default function Home() {
             <Link isExternal href="https://www.jesus.ox.ac.uk">
               Jesus College
             </Link>
-            . He started in September 2023, in the Department of Computer
-            Science (Human-Centred Computing group). His supervisors are{" "}
+            . He started in September 2023, in the{" "}
+            <Link isExternal href={siteConfig.links.oxfordProfile}>
+              Department of Computer Science
+            </Link>{" "}
+            (Human-Centred Computing group). His supervisors are{" "}
             <Link
               isExternal
               href="https://www.cs.ox.ac.uk/people/nigel.shadbolt/"
@@ -380,7 +389,11 @@ export default function Home() {
             <Link isExternal href="https://www.cs.ox.ac.uk/people/jun.zhao/">
               Jun Zhao
             </Link>
-            , and he is a member of the Oxford Martin{" "}
+            , and he is a{" "}
+            <Link isExternal href={siteConfig.links.oxfordMartinProfile}>
+              member
+            </Link>{" "}
+            of the Oxford Martin{" "}
             <Link
               isExternal
               href="https://www.oxfordmartin.ox.ac.uk/programmes/ethical-web-and-data-architectures"
@@ -509,16 +522,26 @@ export default function Home() {
           rel="solid:publicTypeIndex"
           resource={siteConfig.pod.publicTypeIndex}
         />
-        {/* NB: schema:sameAs + rdfs:seeAlso only — NOT owl:sameAs. These URLs are
-            profile/account pages ABOUT Jesse (GitHub, ORCID, the ODI profile,
-            the blog, …), not OWL-identical copies of the person resource, so
-            asserting owl:sameAs would wrongly merge the person with those pages
-            under OWL reasoning. schema:sameAs is exactly "the URL of a reference
-            page that unambiguously indicates the item's identity", and
-            rdfs:seeAlso is the generic "see also". */}
+        {/* schema:sameAs + rdfs:seeAlso for the full identity set. These URLs are
+            profile/account PAGES about Jesse (GitHub, Google Scholar, the ODI
+            and Oxford people pages, the blog, …) — reference pages that
+            unambiguously indicate the item's identity, NOT OWL-identical copies
+            of the person resource. So we use schema:sameAs (exactly "the URL of
+            a reference page that unambiguously indicates the item's identity")
+            + rdfs:seeAlso ("see also"), NOT owl:sameAs — asserting owl:sameAs to
+            a page would wrongly merge the person with those pages under OWL. */}
         {siteConfig.sameAs.map((url) => (
           <span key={url} rel="schema:sameAs rdfs:seeAlso" resource={url} />
         ))}
+        {/* owl:sameAs is reserved for the ONE genuinely person-denoting IRI: the
+            ORCID iD. https://orcid.org/0000-0002-5771-988X is, under ORCID's own
+            linked-data model, an identifier for the RESEARCHER (it dereferences
+            to RDF describing the Person), not a page about them — so it IS
+            owl-identical to <#me>. Asserting owl:sameAs here strengthens the
+            WebID as a scholarly identity hub and lets reasoners merge Jesse's
+            ORCID-published works into the <#me> entity, WITHOUT the
+            page-conflation hazard that blocks owl:sameAs for the URLs above. */}
+        <span rel="owl:sameAs" resource={siteConfig.links.orcid} />
         {/* eslint-enable react/no-unknown-property */}
       </div>
     </div>
