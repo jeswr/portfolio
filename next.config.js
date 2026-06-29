@@ -15,6 +15,22 @@ const nextConfig = {
       },
     ];
   },
+  // `/ns/` is the home, under this permanent domain, for @jeswr's family of
+  // experimental Solid vocabularies — it is the target of the
+  // `w3id.org/jeswr/` redirect. Path-preserving proxy to the GitHub Pages
+  // source where the vocabularies are authored, so the canonical namespace
+  // resolves under jeswr.org (a domain the owner controls) rather than a
+  // transient repo URL. Excluded from the homepage content-negotiation
+  // middleware (see middleware.ts matcher) so the proxied vocabulary bytes are
+  // served untouched rather than re-parsed as homepage RDFa.
+  async rewrites() {
+    return [
+      {
+        source: "/ns/:path*",
+        destination: "https://jeswr.github.io/solid-federation-vocab/:path*",
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
