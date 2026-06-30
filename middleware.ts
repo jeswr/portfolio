@@ -29,10 +29,13 @@ import { siteConfig } from '@/config/site';
 // The matcher's negative lookahead (Next internals, static assets, generated
 // metadata routes, the OG image) must NEVER be re-fetched or content-negotiated
 // — doing so would corrupt images, the sitemap/robots/manifest, and the OG card.
+// `ns/` is also excluded: it is the proxied vocabulary namespace (see the
+// `/ns/` rewrite in next.config.js) whose bytes are served straight from the
+// upstream source and must NOT be re-parsed as homepage RDFa.
 export const config = {
   runtime: 'nodejs',
   matcher: [
-    '/((?!_next/|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|txt|xml|json|woff2?|ttf)$).*)',
+    '/((?!ns/|_next/|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|txt|xml|json|woff2?|ttf)$).*)',
   ],
 };
 
