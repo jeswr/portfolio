@@ -20,7 +20,7 @@ import { siteConfig } from '@/config/site';
 // must never re-handle them.
 export const config = {
   matcher: [
-    '/((?!_next/|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|sitemap.xml|robots.txt|manifest.webmanifest|agent$|\\.well-known/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|txt|xml|json|woff2?|ttf)$).*)',
+    '/((?!_next/|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|sitemap.xml|robots.txt|manifest.webmanifest|agent/?$|\\.well-known/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|txt|xml|json|woff2?|ttf)$).*)',
   ],
 };
 
