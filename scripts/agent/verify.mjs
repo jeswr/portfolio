@@ -92,10 +92,10 @@ for (const [label, body, contentType] of [
     fetch: stubFetch(pointerTurtle, body, contentType),
     requireOwnerMatch: true,
   });
-  check(result.pointers.length === 2, "profile carries both pointer predicates",
+  check(result.pointers.length === 1, "profile carries exactly the interop pointer",
     `got ${result.pointers.length}`);
   check(result.pointers[0]?.predicate === HAS_AUTHORIZATION_AGENT,
-    "interop:hasAuthorizationAgent is the priority pointer",
+    "the pointer is interop:hasAuthorizationAgent (schema:agent dropped)",
     result.pointers[0]?.predicate);
   check(result.pointers.every((p) => p.agent === AGENT_IRI),
     `every pointer targets ${AGENT_IRI}`);

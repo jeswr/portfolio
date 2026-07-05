@@ -517,17 +517,14 @@ export default function Home() {
             module so this triple cannot drift from the served descriptors; the
             canonical quads are built by @jeswr/solid-agent-card's
             buildAgentPointer and self-verified in scripts/agent/verify.mjs.
-            Two predicates, one object: interop:hasAuthorizationAgent (the SAI
-            "agent that represents you" — discoverAgent's priority predicate)
-            plus schema:agent for industry reach (the site-wide schema: prefix
-            expands to http://schema.org/, which discoverAgent also reads).
-            Deliberately NOT mirrored into the head JSON-LD: schema.org defines
-            `agent` on Action, not Person, so it would be noise to SEO tooling —
-            the pointer is WebID-profile (RDFa) surface, like solid:oidcIssuer. */}
-        <span
-          rel="interop:hasAuthorizationAgent schema:agent"
-          resource={AGENT_IRI}
-        />
+            interop:hasAuthorizationAgent ALONE — the SAI "agent that represents
+            you" (discoverAgent's priority predicate). NOT schema:agent:
+            schema.org defines `agent` on Action, not Person, so it is
+            domain-incorrect on <#me> — and redundant once the correct
+            Solid-interop predicate is present. A WebID-profile (RDFa) triple,
+            like solid:oidcIssuer; deliberately NOT mirrored into the head
+            JSON-LD. */}
+        <span rel="interop:hasAuthorizationAgent" resource={AGENT_IRI} />
         {/* NB: schema:sameAs + rdfs:seeAlso only — NOT owl:sameAs. These URLs are
             profile/account pages ABOUT Jesse (GitHub, ORCID, the ODI profile,
             the blog, …), not OWL-identical copies of the person resource, so

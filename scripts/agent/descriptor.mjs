@@ -64,11 +64,12 @@ export const descriptor = {
 };
 
 /**
- * The pointer predicates the homepage WebID profile publishes, in the exact
- * order buildAgentPointer receives them. `interop:hasAuthorizationAgent` is the
- * SAI "agent that represents you" (discoverAgent's priority-1 predicate);
- * `schema:agent` adds industry reach. NB the page RDFa expands `schema:` to
- * `http://schema.org/` (the site-wide prefix), which discoverAgent also reads
- * (its priority-3 SCHEMA_AGENT_HTTP form).
+ * The pointer predicate(s) the homepage WebID profile publishes — kept IN SYNC
+ * with the `rel=` on the pointer span in app/page.tsx so verify.mjs's stub
+ * profile tests exactly what the site emits. `interop:hasAuthorizationAgent`
+ * ALONE: the SAI "agent that represents you" (discoverAgent's priority-1
+ * predicate). NOT `schema:agent` — schema.org defines `agent` on Action, not
+ * Person, so it is domain-incorrect on <#me>, and redundant once the correct
+ * Solid-interop predicate is present.
  */
-export const POINTER_PREDICATES = ["interop:hasAuthorizationAgent", "schema:agent"];
+export const POINTER_PREDICATES = ["interop:hasAuthorizationAgent"];
