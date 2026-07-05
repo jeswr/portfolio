@@ -19,6 +19,9 @@ export const siteConfig = {
     schema: "http://schema.org/",
     vcard: "http://www.w3.org/2006/vcard/ns#",
     solid: "http://www.w3.org/ns/solid/terms#",
+    // Solid Interoperability (SAI) — carries the WebID→agent pointer
+    // (interop:hasAuthorizationAgent, see the sr-only block in app/page.tsx).
+    interop: "http://www.w3.org/ns/solid/interop#",
     space: "http://www.w3.org/ns/pim/space#",
     ldp: "http://www.w3.org/ns/ldp#",
     dct: "http://purl.org/dc/terms/",

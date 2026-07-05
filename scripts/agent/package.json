@@ -1,0 +1,14 @@
+{
+  "name": "portfolio-agent-descriptor-tools",
+  "private": true,
+  "type": "module",
+  "description": "Generator + self-verifier for the agent descriptors served by jeswr.org (the A2A Agent Card, the ANP Agent Description, and the WebID→agent pointer). A standalone mini-workspace so the site's own build/deploy never installs or builds these tools — the artifacts are generated here and committed.",
+  "scripts": {
+    "generate": "node generate.mjs",
+    "verify": "node verify.mjs",
+    "fix:lockfile-transport": "node normalize-lockfile.mjs"
+  },
+  "devDependencies": {
+    "@jeswr/solid-agent-card": "github:jeswr/solid-agent-card#6e930e9ef6bc81358caa3dc0d011773903ae2201"
+  }
+}

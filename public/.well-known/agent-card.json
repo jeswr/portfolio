@@ -1,0 +1,17 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "Jesse Wright's agent",
+  "description": "The personal agent representing Jesse Wright (WebID https://jeswr.org/#me). Under active development: this descriptor is the discovery pointer — the agent does not yet expose a live task endpoint. To reach Jesse, use the contact details in his WebID profile at https://jeswr.org/.",
+  "url": "https://jeswr.org/agent",
+  "securitySchemes": {
+    "solid-oidc": {
+      "type": "solid-oidc",
+      "description": "WebID + Solid-OIDC with DPoP-bound tokens (RFC 9449). The issuer is the same one the owner's WebID trusts (solid:oidcIssuer).",
+      "openIdConnectUrl": "https://idp.solid-test.jeswr.org"
+    }
+  },
+  "x-solid": {
+    "owner": "https://jeswr.org/#me",
+    "agentDescription": "https://jeswr.org/agent"
+  }
+}

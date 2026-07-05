@@ -13,6 +13,19 @@ const nextConfig = {
         source: "/",
         headers: [{ key: "Vary", value: "Accept" }],
       },
+      // The agent-description routes are content-negotiated on Accept too
+      // (Turtle / JSON-LD / a 303 to the homepage for browsers — see
+      // app/agent/handler.ts). Next's router overwrites a route handler's own
+      // Vary header with its RSC vary set, so — exactly as for "/" above — the
+      // cache-correctness copy is declared here.
+      {
+        source: "/agent",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      {
+        source: "/.well-known/agent-descriptions",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
     ];
   },
   // `/ns/` is the home, under this permanent domain, for @jeswr's family of

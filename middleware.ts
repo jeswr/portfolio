@@ -32,10 +32,14 @@ import { siteConfig } from '@/config/site';
 // `ns/` is also excluded: it is the proxied vocabulary namespace (see the
 // `/ns/` rewrite in next.config.js) whose bytes are served straight from the
 // upstream source and must NOT be re-parsed as homepage RDFa.
+// `/agent` and `/.well-known/…` are excluded too: the agent-descriptor surfaces
+// (app/agent/route.ts, the ANP well-known route, the static A2A agent-card.json)
+// do their OWN Accept negotiation over pre-generated documents — this
+// middleware's RDFa transform must never re-handle them.
 export const config = {
   runtime: 'nodejs',
   matcher: [
-    '/((?!ns/|_next/|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|txt|xml|json|woff2?|ttf)$).*)',
+    '/((?!ns/|_next/|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|sitemap.xml|robots.txt|manifest.webmanifest|agent/?$|\\.well-known/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|txt|xml|json|woff2?|ttf)$).*)',
   ],
 };
 
