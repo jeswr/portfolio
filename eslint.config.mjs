@@ -22,6 +22,13 @@ const compat = new FlatCompat({
 });
 
 export default [
+  {
+    // GENERATED artifact (written by scripts/agent/generate.mjs and
+    // byte-verified against a fresh build by scripts/agent/verify.mjs) — a
+    // formatter rewrite would break the freshness check, so lint must never
+    // touch it. An object with only `ignores` is a GLOBAL ignore in flat config.
+    ignores: ["config/agent-description.generated.ts"],
+  },
   ...fixupConfigRules(
     compat.extends(
       "plugin:react/recommended",

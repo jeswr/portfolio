@@ -1,6 +1,7 @@
 import { Link } from "@nextui-org/link";
 import NextImage from "next/image";
 
+import { AGENT_IRI } from "@/config/agent-description.generated";
 import { siteConfig } from "@/config/site";
 import { title, subtitle } from "@/components/primitives";
 import headshot from "@/public/jesse-wright.jpg";
@@ -508,6 +509,24 @@ export default function Home() {
         <span
           rel="solid:publicTypeIndex"
           resource={siteConfig.pod.publicTypeIndex}
+        />
+        {/* The WebID→agent pointer (agentic-Solid M1: "the WebID points to an
+            agent"). Links <#me> to the self-describing agent document served at
+            /agent (an ANP Agent Description; A2A card at
+            /.well-known/agent-card.json). AGENT_IRI comes from the GENERATED
+            module so this triple cannot drift from the served descriptors; the
+            canonical quads are built by @jeswr/solid-agent-card's
+            buildAgentPointer and self-verified in scripts/agent/verify.mjs.
+            Two predicates, one object: interop:hasAuthorizationAgent (the SAI
+            "agent that represents you" — discoverAgent's priority predicate)
+            plus schema:agent for industry reach (the site-wide schema: prefix
+            expands to http://schema.org/, which discoverAgent also reads).
+            Deliberately NOT mirrored into the head JSON-LD: schema.org defines
+            `agent` on Action, not Person, so it would be noise to SEO tooling —
+            the pointer is WebID-profile (RDFa) surface, like solid:oidcIssuer. */}
+        <span
+          rel="interop:hasAuthorizationAgent schema:agent"
+          resource={AGENT_IRI}
         />
         {/* NB: schema:sameAs + rdfs:seeAlso only — NOT owl:sameAs. These URLs are
             profile/account pages ABOUT Jesse (GitHub, ORCID, the ODI profile,
