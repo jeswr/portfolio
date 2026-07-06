@@ -10,7 +10,7 @@ import { WorkstreamNav } from "./WorkstreamNav";
 export const metadata: Metadata = {
   title: "The Accountable Web of Agents",
   description:
-    "A vision paper: Solid, Verifiable Credential Data Integrity, PROV, ODRL, and data federations as the substrate for an accountable, machine-readable agentic web. Working draft — under ongoing review.",
+    "A vision paper: Solid, Integrity, PROV, ODRL, and data federations as the substrate for an accountable, machine-readable agentic web. Working draft — under ongoing review.",
   openGraph: {
     title: "The Accountable Web of Agents",
     description:
@@ -157,19 +157,23 @@ export default function AgenticWebPage() {
               entirely from existing W3C standards. <strong>Solid</strong> gives
               people and organisations data stores they control, with standard
               authentication and access control.{" "}
-              <strong>Verifiable Credential Data Integrity</strong> makes data
-              portable <em>and</em> tamper-evident: signatures travel with the
-              graph, not the connection. <strong>PROV</strong> records where
-              every artifact came from — which agent, which activity, acting for
-              whom. <strong>ODRL</strong> expresses the policies and agreements
-              under which data may be used — and, critically, makes the{" "}
-              <em>owner</em> of an agent legally accountable for what that agent
-              does, because the agreement the agent operates under is an
-              explicit, signed, machine-readable artifact.{" "}
-              <strong>Data federations</strong> — sector-scoped agreements on
-              vocabularies, shapes, and membership — make independent
-              applications and agents actually interoperable rather than merely
-              co-located.
+              <strong>Integrity proofs that travel with the data</strong> make
+              it portable <em>and</em> tamper-evident — verification moves with
+              the graph, not the connection. The requirement is integrity
+              itself; the mechanisms are several, and today’s workhorse is W3C
+              Verifiable Credential Data Integrity: signatures over the
+              canonicalised graph, with content-addressed hashes and
+              selective-disclosure proofs as sibling mechanisms behind the same
+              requirement. <strong>PROV</strong> records where every artifact
+              came from — which agent, which activity, acting for whom.{" "}
+              <strong>ODRL</strong> expresses the policies and agreements under
+              which data may be used — and, critically, makes the <em>owner</em>{" "}
+              of an agent legally accountable for what that agent does, because
+              the agreement the agent operates under is an explicit, signed,
+              machine-readable artifact. <strong>Data federations</strong> —
+              sector-scoped agreements on vocabularies, shapes, and membership —
+              make independent applications and agents actually interoperable
+              rather than merely co-located.
             </p>
 
             <p>
@@ -398,9 +402,10 @@ export default function AgenticWebPage() {
                     <span className={styles.eyebrow2}>
                       §2.2 · the integrity layer
                     </span>
-                    <span className={styles.bandName}>Data Integrity</span>
+                    <span className={styles.bandName}>Integrity</span>
                     <span className={styles.bandDesc}>
-                      VC 2.0 + Data Integrity proofs over canonicalised RDF
+                      proofs that data meets a stated integrity level — VC-DI,
+                      content hashes, SD/ZK
                     </span>
                   </span>
                   <span className={styles.spectag}>VC-DI / RDFC</span>
@@ -450,7 +455,7 @@ export default function AgenticWebPage() {
             </div>
 
             <h3 id="sec-2-2">
-              2.2 Data Integrity: proofs that travel with the data
+              2.2 Integrity: proofs that travel with the data
             </h3>
             <div className={styles.prose}>
               <p>
@@ -461,17 +466,24 @@ export default function AgenticWebPage() {
               </p>
 
               <p>
-                The [VC-DM] and [VC-DI] (W3C Recommendations, 2025) solve this
-                by embedding the proof in the data: the graph is canonicalised
-                ([RDFC]) and signed ([DI-EDDSA]), so any holder can verify
-                integrity and authorship offline, no matter how many hops the
-                data has travelled. Because the signature is over the{" "}
-                <em>canonical graph</em> rather than a byte stream, the data
-                remains queryable, mergeable Linked Data — signed data is still
-                data.
+                What the agentic web needs is therefore a statement of{" "}
+                <strong>required integrity</strong> — tamper-evidence,
+                authorship, offline verifiability, freshness — and mechanisms
+                that demonstrably meet it. Integrity is the requirement; no
+                single proof format is. The mechanism family is broad:
+                content-addressed hashes pinned by a trusted reference (how this
+                stack’s protocol documents are already secured), detached
+                signatures over canonicalised RDF, selective-disclosure and
+                zero-knowledge proofs, and — the workhorse realization in this
+                stack — the [VC-DM] with [VC-DI] proofs (W3C Recommendations,
+                2025): the graph is canonicalised ([RDFC]) and signed
+                ([DI-EDDSA]), so any holder can verify integrity and authorship
+                offline, however many hops the data has travelled. Because the
+                signature is over the <em>canonical graph</em> rather than a
+                byte stream, signed data is still data.
               </p>
 
-              <p>In this stack, Data Integrity does double duty:</p>
+              <p>In this stack, the integrity layer does double duty:</p>
               <ul>
                 <li>
                   <strong>Claims</strong> become verifiable credentials: “this
@@ -482,12 +494,22 @@ export default function AgenticWebPage() {
                   <strong>
                     Selective disclosure and zero-knowledge proofs
                   </strong>{" "}
-                  are an upgrade path, not a rewrite: the proof suite is
-                  pluggable, so BBS-style or ZK-over-SPARQL proofs (an active
-                  research line in the adjacent SPARQ project) slot into the
-                  same verification pipeline.
+                  are not an upgrade path bolted onto VC, but sibling mechanisms
+                  behind the same integrity requirement: a verifier states the
+                  level — and properties, such as unlinkability — it requires,
+                  and VC-DI, BBS-style proofs, or ZK-over-SPARQL (an active
+                  research line in the adjacent SPARQ project) satisfy it
+                  interchangeably.
                 </li>
               </ul>
+
+              <p>
+                These mechanisms are mapped against a security-property ontology
+                developed alongside the SPARQ ZK work — covering properties such
+                as unlinkability, post-quantum resistance, and disclosure
+                leakage — giving the requirement/mechanism split a formal
+                grounding, not just a rhetorical one.
+              </p>
             </div>
 
             <h3 id="sec-2-3">2.3 PROV: where everything came from</h3>
@@ -545,7 +567,8 @@ export default function AgenticWebPage() {
                   may do, must do, and must not do.
                 </li>
                 <li>
-                  The agreement is <strong>signed</strong> (Data Integrity) and{" "}
+                  The agreement is <strong>integrity-attested</strong> — in the
+                  running stack, signed with a VC-DI proof — and{" "}
                   <strong>referenced from the provenance chain</strong> (PROV),
                   so any downstream party can mechanically answer:{" "}
                   <em>
@@ -771,8 +794,11 @@ export default function AgenticWebPage() {
                 <p>
                   Alice holds a WebID; her agent holds its own WebID; Alice’s
                   profile links the two. Alice issues her agent an{" "}
-                  <strong>authorization credential</strong> — a Verifiable
-                  Credential, signed with a Data Integrity proof, stating{" "}
+                  <strong>authorization credential</strong> — an
+                  integrity-attested statement (in the running implementation, a
+                  W3C Verifiable Credential with a Data Integrity proof; the
+                  verifier requires the integrity <em>level</em>, not the
+                  format) stating{" "}
                   <em>
                     “WebID A authorizes agent Y to act in scope Z under ODRL
                     policy P”
@@ -930,7 +956,8 @@ export default function AgenticWebPage() {
                       <code>solid-vc</code>
                     </td>
                     <td>
-                      VC 2.0 build/sign/verify with Data Integrity (
+                      the first registered integrity mechanism: VC 2.0
+                      build/sign/verify with Data Integrity (
                       <code>eddsa-rdfc-2022</code>, <code>ecdsa-rdfc-2019</code>{" "}
                       over RDFC-1.0), fail-closed verification gates, pluggable
                       proof-suite seam; the{" "}
@@ -1352,7 +1379,7 @@ export default function AgenticWebPage() {
                 centralising; it will leave agency, interoperability, and
                 accountability as properties <em>of the platforms</em>, on loan
                 to everyone else. The data path requires assembling standards
-                that already exist — Solid for control, Data Integrity for
+                that already exist — Solid for control, integrity proofs for
                 truth-carrying data, PROV for origin, ODRL for terms and
                 accountability, federations for actual interoperability — into a
                 substrate agents can act on directly.
