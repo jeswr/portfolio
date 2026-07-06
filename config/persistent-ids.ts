@@ -31,8 +31,14 @@ export interface PersistentIdEntry {
   title: string;
   /** Conventional Turtle prefix, where one is established. */
   prefix?: string;
-  /** The legacy w3id.org IRI this entry is the designated successor of. */
-  w3id: string;
+  /**
+   * The legacy w3id.org IRI this entry is the designated successor of, for a
+   * namespace that was drafted under w3id.org before the no-w3id directive.
+   * Omit entirely for a namespace minted directly under jeswr.org from
+   * inception (the standing rule going forward) — it never had a w3id
+   * predecessor to document.
+   */
+  w3id?: string;
   /** GitHub repository (owner/name) that mints/documents the namespace. */
   repo?: string;
   /** Raw Turtle representation (raw.githubusercontent.com, pinned to main). */
@@ -300,6 +306,22 @@ export const PERSISTENT_IDS: ReadonlyArray<PersistentIdEntry> = [
   },
 
   // ── registered but not yet publicly resolvable ───────────────────────────
+  {
+    // Minted directly under jeswr.org from inception — no w3id.org predecessor
+    // (an earlier design draft briefly proposed one; fixed before the repo was
+    // ever published, so there is nothing to document here). Not yet on
+    // GitHub, hence `pending`; the turtle/html targets below are the intended
+    // post-publish representations, ready to resolve the moment the repo goes
+    // public — flip `pending` to false then (verify each URL answers 200 first).
+    slug: "integrity",
+    tree: "ns",
+    title: "Integrity abstraction vocabulary (property-profile, fail-closed)",
+    prefix: "integrity",
+    repo: "jeswr/integrity",
+    turtle: `${RAW}/jeswr/integrity/main/integrity.ttl`,
+    html: `${GH}/jeswr/integrity`,
+    pending: true,
+  },
   {
     slug: "solid-problem",
     tree: "ns",

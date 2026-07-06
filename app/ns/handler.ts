@@ -49,8 +49,10 @@ export async function handlePersistentId(
   }
 
   if (entry.pending) {
+    const canonical = `https://jeswr.org/${tree}/${entry.slug}`;
+
     return notFound(
-      `The namespace <${entry.w3id}> (${entry.title}) is registered but its ` +
+      `The namespace <${canonical}> (${entry.title}) is registered but its ` +
         "documentation is not yet published. Index: https://jeswr.org/ns",
     );
   }

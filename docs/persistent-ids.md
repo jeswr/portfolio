@@ -29,8 +29,10 @@ Rationale:
 ## Resolution mechanics
 
 - Registry: [`config/persistent-ids.ts`](../config/persistent-ids.ts) — one data
-  entry per namespace (`slug`, tree, title, prefix, the legacy w3id IRI, and the
-  representation URLs). Route handlers:
+  entry per namespace (`slug`, tree, title, prefix, the representation URLs, and
+  the legacy w3id IRI it succeeds — `w3id` is optional and omitted for a
+  namespace minted directly under jeswr.org with no w3id predecessor, e.g.
+  `integrity`). Route handlers:
   [`app/ns/[...slug]/route.ts`](../app/ns/%5B...slug%5D/route.ts) and
   [`app/spec/[...slug]/route.ts`](../app/spec/%5B...slug%5D/route.ts), sharing
   [`app/ns/handler.ts`](../app/ns/handler.ts).
@@ -101,6 +103,7 @@ Legend: **served** = publicly resolvable representations registered here;
 | `…/a2a-rdf/v1` (+ `/kind`, `/protocolHash`, …) | — | a2a-rdf-extension | `index.html` + `spec.statements.ttl` | served `/spec/a2a-rdf/v1` |
 | `…/lws`, `…/lws/v1`, `…/lws/protocol/core/1.0`, `…/lws/access-profile/odrl-1`, `…/lws/problems/*` | — | lws-spec | `index.html` + `index.statements.ttl` | served `/spec/lws` (prefix) |
 | `…/lws/transform/rdf-1` | — | lws-spec | `rdf-transform.html` + `rdf-transform.statements.ttl` | served `/spec/lws/transform/rdf-1` |
+| `integrity#` (no w3id predecessor — minted directly under jeswr.org) | `integrity:` | integrity (not yet public) | `integrity.ttl` | pending |
 | `…/solid-problem#` | — | prod-solid-server (private) | `src/http/problemTypes.ts` | pending |
 | `…/agentic#` | — | agentic-solid-vision (unpublished) | — | pending |
 | `…/interop#`, `…/interop/...`, `…/ac-sparql#` | — | standards-interop-map (unpublished) | `schema/interop.ttl` | pending |
