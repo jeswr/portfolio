@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "The Accountable Web of Agents",
     description:
-      "A vision for an automated, data-driven future built on Solid — data-centric, verifiable, accountable agents in place of platform intermediation. Working draft — under ongoing review.",
+      "A vision for an automated, data-driven future built on Solid — data-centric agents whose data carries its own integrity, provenance, and terms, in place of platform intermediation. Working draft — under ongoing review.",
     type: "article",
   },
 };
