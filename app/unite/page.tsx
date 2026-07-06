@@ -489,7 +489,7 @@ export default function UnitePage() {
                 No LLM-mediated synthesis machinery yet (the Habermas-Machine
                 step is design-stage; the convergence room computes outcomes
                 from votes). ODRL consent is the author’s standing consent{" "}
-                <em>record</em>, not yet enforced service-side. Steward signing
+                <em>record</em>, not yet enforced server-side. Steward signing
                 is pending, and the two-steward floor is shown honestly unmet.
                 Sortition mini-publics are designed, not implemented, and unite
                 never claims representativeness — self-selected maps inform,

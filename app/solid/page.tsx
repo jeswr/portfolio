@@ -305,7 +305,7 @@ export default function SolidAssetsPage() {
                 exist in the repos — linkding (bookmarks), Excalidraw
                 (whiteboards), Elk (Mastodon social), Miniflux (RSS), and Actual
                 (budgeting) — each with a self-contained Solid persistence layer
-                on a <code>feat/solid</code> branch.{" "}
+                on a dedicated Solid feature branch.{" "}
                 <strong>None of the five is publicly deployed</strong>; they are
                 working forks, not hosted services.
               </p>
