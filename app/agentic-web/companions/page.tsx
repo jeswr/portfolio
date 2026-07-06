@@ -9,11 +9,11 @@ import { DraftBanner } from "../DraftBanner";
 export const metadata: Metadata = {
   title: "Agentic-Solid Companion Specifications",
   description:
-    "A catalogue of machine-readable spec companions — sidecar RDF/SHACL documents that make the normative statements in five Agentic-Solid specifications machine-checkable. Draft — pending Claude Fable 5 review.",
+    "A catalogue of machine-readable spec companions — sidecar RDF/SHACL documents that make the normative statements in five Agentic-Solid specifications machine-checkable. Working draft — under ongoing review.",
   openGraph: {
     title: "Agentic-Solid Companion Specifications",
     description:
-      "The machine-readable companion layer for five Agentic-Solid specifications — a testability spine and a SHACL spec-of-specs guardrail. Draft — pending Claude Fable 5 review.",
+      "The machine-readable companion layer for five Agentic-Solid specifications — a testability spine and a SHACL spec-of-specs guardrail. Working draft — under ongoing review.",
     type: "article",
   },
 };
@@ -324,6 +324,10 @@ export default function AgenticWebCompanionsPage() {
             </Link>
             , which this catalogue’s format is §3.4’s “querying under
             authorization” and machine-readable-first argument made concrete.
+          </span>
+          <span>
+            Part of the <Link href="/solid">Solid assets overview</Link> — the
+            machine-readable layer of the specification catalogue there.
           </span>
           <span>© Jesse Wright, 2026. Draft — pending maintainer review.</span>
         </footer>

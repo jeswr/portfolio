@@ -961,3 +961,35 @@ a.stackBand[data-i="4"] {
   border-left: 2px solid var(--ochre);
   padding-left: 0.7rem;
 }
+
+/* ---------- cross-workstream nav strip (shared by /agentic-web, /unite, /solid) ---------- */
+.workstreamNav {
+  border: 1px solid var(--line);
+  background: var(--paper-deep);
+  padding: 0.8rem 1.25rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.9em;
+  row-gap: 0.3em;
+}
+.workstreamNav > * + *::before {
+  content: "·";
+  margin-right: 0.9em;
+  color: var(--ink-faint);
+}
+.workstreamNav a {
+  color: var(--teal-deep);
+  text-decoration-color: var(--teal-pale);
+}
+.workstreamNav a:hover {
+  text-decoration-color: var(--teal);
+}
+.workstreamNavHere {
+  color: var(--ink);
+  font-weight: 600;
+}

@@ -5,15 +5,16 @@ import Link from "next/link";
 
 import styles from "./agentic-web.module.css";
 import { DraftBanner } from "./DraftBanner";
+import { WorkstreamNav } from "./WorkstreamNav";
 
 export const metadata: Metadata = {
   title: "The Accountable Web of Agents",
   description:
-    "A vision paper: Solid, Verifiable Credential Data Integrity, PROV, ODRL, and data federations as the substrate for an accountable, machine-readable agentic web. Draft — pending Claude Fable 5 review.",
+    "A vision paper: Solid, Verifiable Credential Data Integrity, PROV, ODRL, and data federations as the substrate for an accountable, machine-readable agentic web. Working draft — under ongoing review.",
   openGraph: {
     title: "The Accountable Web of Agents",
     description:
-      "A vision for an automated, data-driven future built on Solid — data-centric, verifiable, accountable agents in place of platform intermediation. Draft — pending Claude Fable 5 review.",
+      "A vision for an automated, data-driven future built on Solid — data-centric, verifiable, accountable agents in place of platform intermediation. Working draft — under ongoing review.",
     type: "article",
   },
 };
@@ -59,6 +60,8 @@ export default function AgenticWebPage() {
               <code>ROADMAP.md</code>).
             </em>
           </p>
+
+          <WorkstreamNav current="vision" />
 
           <nav aria-label="Table of contents" className={styles.toc}>
             <p className={styles.tocTitle}>Contents</p>
@@ -885,102 +888,18 @@ export default function AgenticWebPage() {
               </p>
             </div>
 
-            <h3 id="sec-5-1">5.1 Live services</h3>
-            <div className={styles.tableWrap}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Service</th>
-                    <th>URL</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      Solid server (from-scratch TypeScript: LDP, Solid-OIDC +
-                      DPoP, WAC, notifications, S3-backed storage)
-                    </td>
-                    <td>
-                      <code>solid-test.jeswr.org</code>
-                    </td>
-                    <td>
-                      <span className={styles.tagLive}>live</span>;{" "}
-                      <span className={styles.tagDev}>
-                        under active development
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      Identity provider (Keycloak-based Solid-OIDC broker)
-                    </td>
-                    <td>
-                      <code>idp.solid-test.jeswr.org</code>
-                    </td>
-                    <td>
-                      <span className={styles.tagLive}>live</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      Pod Manager (files, tasks, contacts, sharing, type
-                      indexes…)
-                    </td>
-                    <td>
-                      <code>app.solid-test.jeswr.org</code>
-                    </td>
-                    <td>
-                      <span className={styles.tagLive}>live</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      App catalogue (Linked Data catalogue: DCAT + schema.org,
-                      content-negotiated)
-                    </td>
-                    <td>
-                      <code>apps.solid-test.jeswr.org</code>
-                    </td>
-                    <td>
-                      <span className={styles.tagLive}>live</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Issue tracker (pod-backed, shared task model)</td>
-                    <td>
-                      <code>issues.solid-test.jeswr.org</code>
-                    </td>
-                    <td>
-                      <span className={styles.tagLive}>live</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      A personal WebID served from a personal site (RDFa/Turtle
-                      content negotiation)
-                    </td>
-                    <td>
-                      <code>jeswr.org</code>
-                    </td>
-                    <td>
-                      <span className={styles.tagLive}>live</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className={styles.prose} style={{ marginTop: "1.4rem" }}>
+            <h3 id="sec-5-1">5.1 The platform underneath</h3>
+            <div className={styles.prose}>
               <p>
-                The server, apps, and identity provider are one{" "}
-                <strong>deployed instance of the whole base layer</strong>:
-                WebID login via Solid-OIDC/DPoP, pods under WAC, multiple
-                independent applications reading and writing the same data.
-                Interoperability is demonstrated concretely: a task created in
-                the issue tracker appears in the Pod Manager because both
-                implement the shared task model (
-                <code>@jeswr/solid-task-model</code>) — the same mechanism a
-                federation generalises.
+                The agentic layers described in this paper run on a from-scratch
+                Solid platform — servers, applications, specifications, and a
+                Rust query engine — built alongside it and documented
+                separately, with live URLs and maturity stated plainly per item,
+                in{" "}
+                <Link href="/solid">
+                  <em>Solid — what we’ve built</em>
+                </Link>
+                ; everything below is the agentic layer proper.
               </p>
             </div>
 
@@ -1081,68 +1000,48 @@ export default function AgenticWebPage() {
                       delegation chains
                     </td>
                   </tr>
-                  <tr>
-                    <td>Interop models</td>
-                    <td>
-                      <code>solid-task-model</code>,{" "}
-                      <code>solid-chat-interop</code>,{" "}
-                      <code>solid-bookmark</code>, <code>solid-drawing</code>,{" "}
-                      <code>solid-memory</code>
-                    </td>
-                    <td>
-                      Shared sector data models (mint minimally, reuse Dublin
-                      Core / schema.org / AS2 / PROV)
-                    </td>
-                  </tr>
                 </tbody>
               </table>
             </div>
+            <p className={styles.worklib}>
+              <b>Reference runtime:</b> <code>accountable-agent-runtime</code> —
+              the §4 scenario as executable code: the composed four-phase chain
+              verifier and the auditor walk, exercised with real cryptography
+              against a golden-master decision matrix (Phase-0; I/O is doubled,
+              no live transport yet — see §5.5).
+            </p>
 
             <h3 id="sec-5-3">5.3 Specifications and experiments</h3>
             <div className={styles.prose}>
-              <ul>
-                <li>
-                  <strong>
-                    Access-Controlled SPARQL Query over a Solid Pod
-                  </strong>{" "}
-                  — ReSpec Editor’s Draft written, Solid CG track (
-                  <code>jeswr/solid-sparql-query</code>); all design decisions
-                  resolved and recorded.
-                </li>
-                <li>
-                  <code>solid-server-rs</code> — an explicitly{" "}
-                  <strong>experimental</strong> Rust Solid server (not a
-                  replacement for the TypeScript server above) used as the
-                  reference implementation target for the access-controlled
-                  query endpoint.
-                </li>
-                <li>
-                  <strong>Solid ↔ mainstream OSS integrations</strong> — forks
-                  and drivers demonstrating that pod-backed storage retrofits
-                  onto existing ecosystems: bookmarks (linkding), whiteboards
-                  (Excalidraw), social (Elk/Mastodon), RSS (Miniflux), finance
-                  (Actual), automation (n8n), CRDT collaboration (Yjs), agent
-                  frameworks (MCP, OpenClaw memory). Each demonstrates the same
-                  pattern: the app keeps its UX; the <em>data</em> moves to a
-                  store the user controls.
-                </li>
-              </ul>
+              <p>
+                The specification work these layers rest on — the
+                access-controlled SPARQL query draft, the clean-slate storage
+                experiment, the authentication profiles, and the experimental
+                Rust servers — is catalogued in{" "}
+                <Link href="/solid#specifications">
+                  the Solid assets overview
+                </Link>
+                , and its machine-readable normative-statement companions are
+                inventoried at{" "}
+                <Link href="/agentic-web/companions">
+                  <em>Solid Spec Companions</em>
+                </Link>
+                .
+              </p>
             </div>
 
             <h3 id="sec-5-4">5.4 The flagship demonstration: unite</h3>
             <div className={styles.prose}>
               <p>
-                The vision’s fullest demonstration is under design as a sibling
-                deliverable: <strong>unite</strong>, a decentralised
-                participatory-democracy platform in which people co-design the
-                future they want — beginning, reflexively, with co-designing the
-                Solid applications they want (which this suite’s generative
-                tooling then implements). unite is constitutionally
-                decentralised — no single codebase, no single standards owner —
-                and is built directly on the federation model described in §2.5.
-                It is deliberately <em>not</em> specified here; it is tracked as
-                its own design effort (
-                <code>jeswr/full-solid-ecosystem#15</code>).
+                The vision’s fullest demonstration is <strong>unite</strong>:
+                participatory democracy on this substrate, in which people
+                describe the futures they want and psychology-informed
+                convergence processes surface the futures they share — built
+                directly on the federation model of §2.5, and designed to have
+                no single codebase and no single standards owner. It is its own
+                workstream, with its own design record and its own honesty
+                rules. <Link href="/unite">Read the unite page</Link> (tracked
+                as <code>jeswr/full-solid-ecosystem#15</code>).
               </p>
             </div>
 
