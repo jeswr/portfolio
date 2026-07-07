@@ -283,6 +283,21 @@ export default function SolidAssetsPage() {
                       <span className={styles.tagLive}>live</span>
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      Personal WebID — the maintainer’s self-hosted WebID; the
+                      jeswr.org homepage <em>is</em> the WebID document (RDFa in
+                      the page, content-negotiable to Turtle), and the suite’s
+                      persistent-ID layer for the vocabularies and
+                      specifications is served from the same domain
+                    </td>
+                    <td>
+                      <code>jeswr.org/#me</code>
+                    </td>
+                    <td>
+                      <span className={styles.tagLive}>live</span>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
