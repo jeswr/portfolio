@@ -13,21 +13,39 @@ const nextConfig = {
         source: "/",
         headers: [{ key: "Vary", value: "Accept" }],
       },
-    ];
-  },
-  // `/ns/` is the home, under this permanent domain, for @jeswr's family of
-  // experimental Solid vocabularies — it is the target of the
-  // `w3id.org/jeswr/` redirect. Path-preserving proxy to the GitHub Pages
-  // source where the vocabularies are authored, so the canonical namespace
-  // resolves under jeswr.org (a domain the owner controls) rather than a
-  // transient repo URL. Excluded from the homepage content-negotiation
-  // middleware (see middleware.ts matcher) so the proxied vocabulary bytes are
-  // served untouched rather than re-parsed as homepage RDFa.
-  async rewrites() {
-    return [
+      // The agent-description routes are content-negotiated on Accept too
+      // (Turtle / JSON-LD / a 303 to the homepage for browsers — see
+      // app/agent/handler.ts). Next's router overwrites a route handler's own
+      // Vary header with its RSC vary set, so — exactly as for "/" above — the
+      // cache-correctness copy is declared here.
+      {
+        source: "/agent",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      {
+        source: "/.well-known/agent-descriptions",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      // `/ns/…` and `/spec/…` are the persistent-identifier trees for the
+      // @jeswr vocabularies + specifications (app/ns/[...slug]/route.ts,
+      // app/spec/[...slug]/route.ts; design in docs/persistent-ids.md): every
+      // response is a 303 whose Location depends on the Accept header, so a
+      // shared cache must key on it. As for "/" and "/agent" above, Next's
+      // router can overwrite a handler-set Vary — the cache-correctness copy
+      // is declared here. (The conneg handlers superseded the earlier
+      // `/ns/:path*` rewrite that path-preservingly proxied the
+      // solid-federation-vocab GitHub Pages site: an afterFiles rewrite would
+      // shadow the dynamic route handler, so the handler itself keeps the
+      // legacy file paths resolving via 303 to the same Pages URLs. Both
+      // trees stay excluded from the homepage RDFa-conneg middleware — see
+      // middleware.ts matcher.)
       {
         source: "/ns/:path*",
-        destination: "https://jeswr.github.io/solid-federation-vocab/:path*",
+        headers: [{ key: "Vary", value: "Accept" }],
+      },
+      {
+        source: "/spec/:path*",
+        headers: [{ key: "Vary", value: "Accept" }],
       },
     ];
   },

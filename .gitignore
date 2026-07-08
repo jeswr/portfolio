@@ -5,6 +5,10 @@
 /.pnp
 .pnp.js
 
+# the agent-descriptor generator mini-workspace (scripts/agent) has its own
+# install; only its package.json + lockfile are tracked
+scripts/agent/node_modules
+
 # testing
 /coverage
 

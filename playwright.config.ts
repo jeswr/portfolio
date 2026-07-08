@@ -6,7 +6,9 @@ import { defineConfig, devices } from "@playwright/test";
 // negotiation, and the SEO/metadata routes. The suite runs against the PRODUCTION
 // build (`npm run build && npm run start`) because the middleware-driven RDF
 // content negotiation (the WebID contract) only runs in a real server, not `next dev`.
-const PORT = 3000;
+// Default 3000; override with PW_PORT when 3000 is held by another local
+// server (e.g. a sibling worktree's `next start`).
+const PORT = Number(process.env.PW_PORT ?? 3000);
 const baseURL = `http://localhost:${PORT}`;
 
 export default defineConfig({
@@ -38,7 +40,7 @@ export default defineConfig({
   // not `next dev`. Locally we reuse a running server for fast iteration; in CI
   // we always boot a fresh one.
   webServer: {
-    command: "npm run build && npm run start",
+    command: `npm run build && npm run start -- -p ${PORT}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

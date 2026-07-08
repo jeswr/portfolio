@@ -88,6 +88,35 @@ Marking the **CI** check a **required status check** in branch protection
 (Settings → Branches → main → "Require status checks to pass before merging") is
 now **optional defence-in-depth** — the workflow enforces the CI gate on its own.
 
+## WebID + agent descriptors
+
+The homepage doubles as Jesse's WebID document (`https://jeswr.org/#me`): its
+RDFa is content-negotiated to Turtle/JSON-LD by `middleware.ts`. The profile
+also points at a self-describing **agent**
+(`interop:hasAuthorizationAgent` → `https://jeswr.org/agent`):
+
+- `/agent` — the agent's IRI; serves the ANP Agent Description (Turtle by
+  default, JSON-LD via `Accept`; browsers are 303-redirected to `/`).
+- `/.well-known/agent-descriptions` — the same document at the ANP discovery
+  path (JSON-LD by default).
+- `/.well-known/agent-card.json` — the A2A Agent Card (static JSON).
+
+All three are generated from the single descriptor in
+`scripts/agent/descriptor.mjs` via
+[`@jeswr/solid-agent-card`](https://github.com/jeswr/solid-agent-card) and
+committed. To change the agent description:
+
+```bash
+cd scripts/agent
+npm install        # standalone mini-workspace; ignore-scripts=true
+npm run generate   # rewrites public/.well-known/agent-card.json +
+                   # config/agent-description.generated.ts
+npm run verify     # freshness + a discoverAgent round-trip with the
+                   # owner back-link required (fail-closed)
+```
+
+`npm run verify` must pass before committing regenerated artifacts.
+
 ## License
 
 Licensed under the [MIT license](https://github.com/nextui-org/next-app-template/blob/main/LICENSE).

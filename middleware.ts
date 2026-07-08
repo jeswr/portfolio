@@ -29,13 +29,19 @@ import { siteConfig } from '@/config/site';
 // The matcher's negative lookahead (Next internals, static assets, generated
 // metadata routes, the OG image) must NEVER be re-fetched or content-negotiated
 // — doing so would corrupt images, the sitemap/robots/manifest, and the OG card.
-// `ns/` is also excluded: it is the proxied vocabulary namespace (see the
-// `/ns/` rewrite in next.config.js) whose bytes are served straight from the
-// upstream source and must NOT be re-parsed as homepage RDFa.
+// `ns/` and `spec/` are also excluded: they are the persistent-identifier
+// trees (app/ns/[...slug]/route.ts, app/spec/[...slug]/route.ts) which do
+// their OWN Accept negotiation and answer 303 — this middleware must never
+// intercept them (its inner fetch would follow the redirect and re-parse the
+// redirect TARGET as homepage RDFa).
+// `/agent` and `/.well-known/…` are excluded too: the agent-descriptor surfaces
+// (app/agent/route.ts, the ANP well-known route, the static A2A agent-card.json)
+// do their OWN Accept negotiation over pre-generated documents — this
+// middleware's RDFa transform must never re-handle them.
 export const config = {
   runtime: 'nodejs',
   matcher: [
-    '/((?!ns/|_next/|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|sitemap.xml|robots.txt|manifest.webmanifest|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|txt|xml|json|woff2?|ttf)$).*)',
+    '/((?!ns/|spec/|_next/|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|sitemap.xml|robots.txt|manifest.webmanifest|agent/?$|\\.well-known/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|txt|xml|json|woff2?|ttf)$).*)',
   ],
 };
 
