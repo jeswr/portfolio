@@ -1,5 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async rewrites() {
+    // `/unite-v2` serves the prebuilt unite v2 demo SPA (a static vite bundle
+    // committed under public/unite-v2/). Next does not resolve a directory
+    // index inside public/, so the clean URL is rewritten to the bundle's
+    // index.html. With the default trailingSlash:false Next itself 308s
+    // `/unite-v2/` → `/unite-v2`, so both spellings land here. The SPA is
+    // hash-routed (#/arc, #/curtain, …) and its asset URLs are absolute under
+    // `/unite-v2/…` (built with --base=/unite-v2/), so this single rewrite is
+    // the only server-side routing it needs. The whole subtree is excluded
+    // from the RDFa-conneg middleware — see middleware.ts.
+    return [
+      {
+        source: "/unite-v2",
+        destination: "/unite-v2/index.html",
+      },
+    ];
+  },
   async headers() {
     // The homepage is content-negotiated on Accept (HTML for browsers/crawlers,
     // Turtle/JSON-LD for RDF clients — see middleware.ts). The RDF transform

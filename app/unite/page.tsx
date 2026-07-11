@@ -57,6 +57,12 @@ export default function UnitePage() {
               development; not production-ready.
             </em>
           </p>
+          <p className={styles.draftNote}>
+            {/* Plain <a>, not next/link: /unite-v2 is a static SPA bundle
+                served via a rewrite, not an app route. */}
+            <a href="/unite-v2">Try the live prototype → /unite-v2</a>{" "}
+            <em>(an in-browser demo — nothing you type leaves your browser)</em>
+          </p>
 
           <WorkstreamNav current="unite" />
         </header>

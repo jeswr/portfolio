@@ -38,10 +38,16 @@ import { siteConfig } from '@/config/site';
 // (app/agent/route.ts, the ANP well-known route, the static A2A agent-card.json)
 // do their OWN Accept negotiation over pre-generated documents — this
 // middleware's RDFa transform must never re-handle them.
+// `unite-v2` (the path and its whole subtree) is excluded: it is a static
+// prebuilt SPA bundle under public/unite-v2/ (the unite v2 demo, served via the
+// next.config.js rewrite) — its index.html, hashed assets, and .ttl/.jsonld
+// fixtures must be served byte-untouched, never conneg-rewritten (the extension
+// allowlist below does NOT cover .ttl/.html/.jsonld, so a prefix exclusion is
+// required, exactly like ns/ and spec/).
 export const config = {
   runtime: 'nodejs',
   matcher: [
-    '/((?!ns/|spec/|_next/|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|sitemap.xml|robots.txt|manifest.webmanifest|agent/?$|\\.well-known/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|txt|xml|json|woff2?|ttf)$).*)',
+    '/((?!ns/|spec/|unite-v2(?:/|$)|_next/|favicon.ico|icon|apple-icon|opengraph-image|twitter-image|sitemap.xml|robots.txt|manifest.webmanifest|agent/?$|\\.well-known/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|txt|xml|json|woff2?|ttf)$).*)',
   ],
 };
 
