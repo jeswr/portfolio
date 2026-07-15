@@ -1,7 +1,6 @@
 import { Link } from "@nextui-org/link";
 import NextImage from "next/image";
 
-import { AGENT_IRI } from "@/config/agent-description.generated";
 import { siteConfig } from "@/config/site";
 import { title, subtitle } from "@/components/primitives";
 import headshot from "@/public/jesse-wright.jpg";
@@ -524,12 +523,9 @@ export default function Home() {
           resource={siteConfig.pod.publicTypeIndex}
         />
         {/* The WebID→agent pointer (agentic-Solid M1: "the WebID points to an
-            agent"). Links <#me> to the self-describing agent document served at
-            /agent (an ANP Agent Description; A2A card at
-            /.well-known/agent-card.json). AGENT_IRI comes from the GENERATED
-            module so this triple cannot drift from the served descriptors; the
-            canonical quads are built by @jeswr/solid-agent-card's
-            buildAgentPointer and self-verified in scripts/agent/verify.mjs.
+            agent"). Links <#me> to the staged, self-describing ANP/RDF Agent
+            Description on Jesse's pod. The co-located A2A JSON card points back
+            to this exact description IRI through x-solid.agentDescription.
             interop:hasAuthorizationAgent ALONE — the SAI "agent that represents
             you" (discoverAgent's priority predicate). NOT schema:agent:
             schema.org defines `agent` on Action, not Person, so it is
@@ -537,7 +533,10 @@ export default function Home() {
             Solid-interop predicate is present. A WebID-profile (RDFa) triple,
             like solid:oidcIssuer; deliberately NOT mirrored into the head
             JSON-LD. */}
-        <span rel="interop:hasAuthorizationAgent" resource={AGENT_IRI} />
+        <span
+          rel="interop:hasAuthorizationAgent"
+          resource={siteConfig.pod.agentDescription}
+        />
         {/* schema:sameAs + rdfs:seeAlso for the full identity set. These URLs are
             profile/account PAGES about Jesse (GitHub, Google Scholar, the ODI
             and Oxford people pages, the blog, …) — reference pages that
