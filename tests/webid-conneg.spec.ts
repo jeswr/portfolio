@@ -1,6 +1,8 @@
 // AUTHORED-BY Claude Opus 4.8
 import { test, expect } from "@playwright/test";
 import { Parser } from "n3";
+import { Readable } from "node:stream";
+import { rdfParser } from "rdf-parse";
 
 // The load-bearing contract: the homepage, content-negotiated to an RDF
 // serialisation, is a valid Solid WebID document. This is what lets the page act
@@ -14,7 +16,11 @@ import { Parser } from "n3";
 const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 const FOAF_PERSON = "http://xmlns.com/foaf/0.1/Person";
 const SOLID_OIDC_ISSUER = "http://www.w3.org/ns/solid/terms#oidcIssuer";
+const HAS_AUTHORIZATION_AGENT =
+  "http://www.w3.org/ns/solid/interop#hasAuthorizationAgent";
 const EXPECTED_ISSUER_HOST = "idp.solid-test.jeswr.org";
+const EXPECTED_AGENT_DESCRIPTION =
+  "https://solid-test.jeswr.org/jeswr/profile/agent-card";
 
 test.describe("WebID content negotiation", () => {
   test("GET / with Accept: text/turtle returns a WebID profile (quad-level)", async ({
@@ -69,6 +75,18 @@ test.describe("WebID content negotiation", () => {
       hasIssuer,
       `<#me> must carry solid:oidcIssuer pointing at ${EXPECTED_ISSUER_HOST}`,
     ).toBe(true);
+
+    const hasAgentPointer = quads.some(
+      (q) =>
+        q.subject.equals(meSubject!) &&
+        q.predicate.value === HAS_AUTHORIZATION_AGENT &&
+        q.object.termType === "NamedNode" &&
+        q.object.value === EXPECTED_AGENT_DESCRIPTION,
+    );
+    expect(
+      hasAgentPointer,
+      `<#me> must point to ${EXPECTED_AGENT_DESCRIPTION}`,
+    ).toBe(true);
   });
 
   test("GET / with Accept: application/ld+json returns JSON-LD describing #me", async ({
@@ -100,6 +118,29 @@ test.describe("WebID content negotiation", () => {
     // The document must mention the #me subject somewhere in its graph.
     const containsMe = JSON.stringify(json).includes("#me");
     expect(containsMe, "JSON-LD must contain the #me subject").toBe(true);
+
+    // Parse the JSON-LD as RDF, then assert the pointer at the quad level. This
+    // proves the RDFa pointer survives both negotiated representations.
+    const quads = [];
+    const quadStream = rdfParser.parse(Readable.from([text]), {
+      contentType: "application/ld+json",
+      baseIRI: response.url(),
+    });
+    for await (const quad of quadStream) {
+      quads.push(quad);
+    }
+    const hasAgentPointer = quads.some(
+      (q) =>
+        q.subject.termType === "NamedNode" &&
+        q.subject.value.endsWith("#me") &&
+        q.predicate.value === HAS_AUTHORIZATION_AGENT &&
+        q.object.termType === "NamedNode" &&
+        q.object.value === EXPECTED_AGENT_DESCRIPTION,
+    );
+    expect(
+      hasAgentPointer,
+      `JSON-LD <#me> must point to ${EXPECTED_AGENT_DESCRIPTION}`,
+    ).toBe(true);
   });
 
   test("Vary: Accept is set so caches key HTML vs RDF separately", async ({

@@ -80,6 +80,10 @@ export const siteConfig = {
     inbox: "https://solid-test.jeswr.org/jeswr/inbox/",
     publicTypeIndex:
       "https://solid-test.jeswr.org/jeswr/settings/publicTypeIndex.ttl",
+    // Staged M1 identity: the WebID pointer resolves the canonical ANP/RDF
+    // Agent Description here. Hosting/public-read setup is a separate
+    // maintainer deployment step; this website branch does not write the pod.
+    agentDescription: "https://solid-test.jeswr.org/jeswr/profile/agent-card",
   },
   // Verified profile links. This list is the single source of truth for both the
   // RDFa schema:sameAs on the page and the JSON-LD sameAs in the head — keep them identical.
