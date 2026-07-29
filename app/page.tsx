@@ -25,10 +25,14 @@ type Project = {
 const flagshipProjects: Project[] = [
   {
     name: "SPARQ",
-    kind: "App · research",
+    kind: "App · research · experimental",
     href: "https://github.com/jeswr/sparq",
+    // Keep this wording aligned with the project's own posture: the repo carries a
+    // `status: experimental` badge and its SECURITY.md states the zero-knowledge
+    // verifier is pending external audit and must not be relied on in production.
+    // Do not restate the ZK guarantee as delivered.
     blurb:
-      "Privacy-preserving query verification: zero-knowledge proofs that a SPARQL query result is correct over RDF and Verifiable Credentials, without revealing the underlying data.",
+      "Experimental research into privacy-preserving query verification: zero-knowledge proofs that a SPARQL query result is correct over RDF and Verifiable Credentials. Pre-1.0; the cryptography is pending external audit.",
   },
   {
     name: "EYE JS",
@@ -70,10 +74,13 @@ const recommendedProjects: Project[] = [
   },
   {
     name: "create-solid-app",
-    kind: "Library · DX",
+    kind: "Library · DX · prototype",
     href: "https://github.com/jeswr/create-solid-app",
+    // NB: this package is `private: true` at 0.0.0-prototype and is deliberately not
+    // published. The name `create-solid-app` on npm belongs to a different author, so
+    // `npx create-solid-app` does NOT run this — do not reinstate that instruction.
     blurb:
-      "Run npx create-solid-app to scaffold a new Solid app with the suite conventions baked in.",
+      "A prototype scaffolder for new Solid apps with the suite conventions baked in. Unpublished — clone the repo to try it.",
   },
   {
     name: "solid-components",
