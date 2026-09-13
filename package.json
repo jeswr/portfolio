@@ -29,7 +29,7 @@
 		"@nextui-org/switch": "2.2.8",
 		"@nextui-org/system": "2.4.6",
 		"@nextui-org/theme": "2.4.5",
-		"@rdfjs/types": "^1.1.2",
+		"@rdfjs/types": "^2.0.1",
 		"@react-aria/ssr": "3.10.1",
 		"@react-aria/visually-hidden": "3.9.1",
 		"arrayify-stream": "^3.0.0",
