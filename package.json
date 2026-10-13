@@ -54,7 +54,7 @@
 		"@jeswr/shacl2shex": "^1.1.0",
 		"@ldo/cli": "^0.0.1-alpha.28",
 		"@ldo/rdf-utils": "^0.0.1-alpha.24",
-		"@next/eslint-plugin-next": "15.5.19",
+		"@next/eslint-plugin-next": "16.2.11",
 		"@nextui-org/card": "2.2.9",
 		"@nextui-org/image": "2.2.5",
 		"@nextui-org/scroll-shadow": "2.3.5",
