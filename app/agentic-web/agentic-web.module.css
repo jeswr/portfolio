@@ -437,6 +437,26 @@
   border-bottom: 1px solid var(--line);
   background: var(--paper-deep);
 }
+
+/* ---------- image figure (acting-for-us paper) ---------- */
+.paperFigure {
+  margin: 1.5rem 0 0;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.paperFigureImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.paperFigcaption {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  padding: 0.9rem 1.25rem;
+  border-top: 1px solid var(--line);
+  background: var(--paper-deep);
+}
 a.stackBand {
   display: grid;
   grid-template-columns: 1fr auto;
