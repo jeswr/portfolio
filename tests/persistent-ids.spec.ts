@@ -27,7 +27,43 @@ async function statusAndLocation(
 }
 
 test.describe("persistent identifiers — /ns", () => {
-  test("turtle: /ns/fedreg 303s to the raw TTL on main", async ({ request }) => {
+  for (const { slug, html } of [
+    { slug: "pod-docs", html: "https://github.com/jeswr/pod-docs" },
+    { slug: "pod-drive", html: "https://github.com/jeswr/pod-drive" },
+    { slug: "pod-chat", html: "https://github.com/jeswr/solid-chat-interop" },
+  ]) {
+    test(`turtle: /ns/${slug} 303s to the app vocabulary on main`, async ({
+      request,
+    }) => {
+      const { status, location, vary } = await statusAndLocation(
+        request,
+        `/ns/${slug}`,
+        "text/turtle",
+      );
+
+      expect(status).toBe(303);
+      expect(location).toBe(
+        `https://raw.githubusercontent.com/jeswr/solid-sdk/main/apps/${slug}/vocab/${slug}.ttl`,
+      );
+      expect(vary).toContain("Accept");
+    });
+
+    test(`html: /ns/${slug} keeps the README target`, async ({ request }) => {
+      const { status, location, vary } = await statusAndLocation(
+        request,
+        `/ns/${slug}`,
+        "text/html",
+      );
+
+      expect(status).toBe(303);
+      expect(location).toBe(html);
+      expect(vary).toContain("Accept");
+    });
+  }
+
+  test("turtle: /ns/fedreg 303s to the raw TTL on main", async ({
+    request,
+  }) => {
     const { status, location, vary } = await statusAndLocation(
       request,
       "/ns/fedreg",
@@ -54,7 +90,9 @@ test.describe("persistent identifiers — /ns", () => {
     );
   });
 
-  test("json-ld: /ns/task 303s to the published context", async ({ request }) => {
+  test("json-ld: /ns/task 303s to the published context", async ({
+    request,
+  }) => {
     const { status, location } = await statusAndLocation(
       request,
       "/ns/task",
@@ -70,7 +108,10 @@ test.describe("persistent identifiers — /ns", () => {
   test("no Accept header defaults to the html documentation", async ({
     request,
   }) => {
-    const { status, location } = await statusAndLocation(request, "/ns/bookmark");
+    const { status, location } = await statusAndLocation(
+      request,
+      "/ns/bookmark",
+    );
 
     expect(status).toBe(303);
     expect(location).toBe("https://github.com/jeswr/solid-bookmark");
@@ -96,12 +137,12 @@ test.describe("persistent identifiers — /ns", () => {
   }) => {
     const { status, location } = await statusAndLocation(
       request,
-      "/ns/pod-chat",
+      "/ns/memory",
       "text/turtle",
     );
 
     expect(status).toBe(303);
-    expect(location).toBe("https://github.com/jeswr/solid-chat-interop");
+    expect(location).toBe("https://github.com/jeswr/solid-memory");
   });
 
   test("legacy proxy path: /ns/fedreg.ttl still resolves (303 to Pages)", async ({
@@ -135,6 +176,19 @@ test.describe("persistent identifiers — /ns", () => {
     ).toBeVisible();
     // A registry-driven row must be present.
     await expect(page.getByRole("link", { name: "/ns/fedreg" })).toBeVisible();
+
+    for (const slug of ["pod-docs", "pod-drive", "pod-chat"]) {
+      const row = page.getByRole("row").filter({
+        has: page.getByRole("link", { name: `/ns/${slug}`, exact: true }),
+      });
+
+      await expect(
+        row.getByRole("link", { name: "turtle", exact: true }),
+      ).toHaveAttribute(
+        "href",
+        `https://raw.githubusercontent.com/jeswr/solid-sdk/main/apps/${slug}/vocab/${slug}.ttl`,
+      );
+    }
   });
 });
 

@@ -206,9 +206,9 @@ export const PERSISTENT_IDS: ReadonlyArray<PersistentIdEntry> = [
     html: `${GH}/jeswr/spec-companion`,
   },
 
-  // ── vocabularies minted in code (no standalone Turtle published yet) ─────
-  // The html target is the minting repository; authoring a vocabulary Turtle
-  // document per namespace is part of the staged migration (docs/persistent-ids.md).
+  // ── app and code-minted vocabularies ────────────────────────────────────
+  // App Turtle artifacts live in solid-sdk; html keeps the minting repo README.
+  // Other code-minted vocabularies still await standalone Turtle documents.
   {
     slug: "pod-chat",
     tree: "ns",
@@ -216,6 +216,7 @@ export const PERSISTENT_IDS: ReadonlyArray<PersistentIdEntry> = [
     prefix: "pc",
     w3id: "https://w3id.org/jeswr/pod-chat",
     repo: "jeswr/solid-chat-interop",
+    turtle: `${RAW}/jeswr/solid-sdk/main/apps/pod-chat/vocab/pod-chat.ttl`,
     html: `${GH}/jeswr/solid-chat-interop`,
   },
   {
@@ -286,6 +287,7 @@ export const PERSISTENT_IDS: ReadonlyArray<PersistentIdEntry> = [
     prefix: "pd",
     w3id: "https://w3id.org/jeswr/pod-docs",
     repo: "jeswr/pod-docs",
+    turtle: `${RAW}/jeswr/solid-sdk/main/apps/pod-docs/vocab/pod-docs.ttl`,
     html: `${GH}/jeswr/pod-docs`,
   },
   {
@@ -294,6 +296,7 @@ export const PERSISTENT_IDS: ReadonlyArray<PersistentIdEntry> = [
     title: "Pod drive vocabulary",
     w3id: "https://w3id.org/jeswr/pod-drive",
     repo: "jeswr/pod-drive",
+    turtle: `${RAW}/jeswr/solid-sdk/main/apps/pod-drive/vocab/pod-drive.ttl`,
     html: `${GH}/jeswr/pod-drive`,
   },
   {

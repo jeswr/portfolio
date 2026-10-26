@@ -74,6 +74,10 @@ answers 200 before committing. Point `turtle` at
 
 ## Namespace inventory (2026-07, from a suite-wide grep for `w3id.org/jeswr`)
 
+Updated 2026-10-26 for DECISIONS V12 / VOC-05: pod-docs, pod-drive, and pod-chat
+serve Turtle artifacts from `jeswr/solid-sdk` on `main`, retaining their existing
+HTML README targets. Their `/ns` index rows expose both representations.
+
 Legend: **served** = publicly resolvable representations registered here;
 **pending** = registered, minting repo private/unpublished.
 
@@ -89,7 +93,7 @@ Legend: **served** = publicly resolvable representations registered here;
 | `…/bookmark#` | `book:` | solid-bookmark | `bookmark.ttl` | served `/ns/bookmark` |
 | `…/drawing#` | `draw:` | solid-drawing | `drawing.ttl` | served `/ns/drawing` |
 | `…/spec-companion#` | `sc:` | spec-companion | `vocab/spec-companion.ttl` | served `/ns/spec-companion` |
-| `…/pod-chat#` | `pc:` | solid-chat-interop | terms in `src/vocab.ts`; no vocab TTL | served (html only) |
+| `…/pod-chat#` | `pc:` | solid-chat-interop / solid-sdk | `apps/pod-chat/vocab/pod-chat.ttl` + README | served `/ns/pod-chat` |
 | `…/memory#` | `mem:` | solid-memory | terms in code; no vocab TTL | served (html only) |
 | `…/solid-vc#` | — | solid-vc | terms in `src/credential.ts` | served (html only) |
 | `…/odrl-delegation#` (+ slashless profile IRI) | `odrld:` | solid-odrl | terms in `src/vocab.ts` | served (html only) |
@@ -97,8 +101,9 @@ Legend: **served** = publicly resolvable representations registered here;
 | `…/fedtrust#` | `fedtrust:` | federation-trust | terms in `src/vocab.ts` | served (html only) |
 | `…/accm#` | `accm:` | solid-access-manager | terms in `src/lib/vocab.ts` | served (html only) |
 | `…/community#` | — | solid-community-feeds | terms in `src/activitystreams.ts` | served (html only) |
-| `…/pod-docs#` | `pd:` | pod-docs | terms in code | served (html only) |
-| `…/pod-drive#`, `…/pod-money#` | — | pod-drive / pod-money | terms in code | served (html only) |
+| `…/pod-docs#` | `pd:` | pod-docs / solid-sdk | `apps/pod-docs/vocab/pod-docs.ttl` + README | served `/ns/pod-docs` |
+| `…/pod-drive#` | — | pod-drive / solid-sdk | `apps/pod-drive/vocab/pod-drive.ttl` + README | served `/ns/pod-drive` |
+| `…/pod-money#` | — | pod-money | terms in code | served (html only) |
 | `…/dpop-sk/v1` | — | dpop-sk-spec | `index.html` (ReSpec) + `spec.statements.ttl` | served `/spec/dpop-sk/v1` |
 | `…/a2a-rdf/v1` (+ `/kind`, `/protocolHash`, …) | — | a2a-rdf-extension | `index.html` + `spec.statements.ttl` | served `/spec/a2a-rdf/v1` |
 | `…/lws`, `…/lws/v1`, `…/lws/protocol/core/1.0`, `…/lws/access-profile/odrl-1`, `…/lws/problems/*` | — | lws-spec | `index.html` + `index.statements.ttl` | served `/spec/lws` (prefix) |
