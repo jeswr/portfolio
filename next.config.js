@@ -66,6 +66,19 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    // The vision paper "Letting Software Agents Act for Us" now lives beside its
+    // reference design and explorer at answerableagents.org, as a pre-publication
+    // draft of the Communications of the ACM version. Temporary (307), so the
+    // address can move again when the paper is published.
+    return [
+      {
+        source: "/agentic-web/acting-for-us",
+        destination: "https://answerableagents.org/paper/",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
